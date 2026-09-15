@@ -14,222 +14,251 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
-  --bg:#0a0b0e;--surface:#13151a;--surface2:#1b1e25;--surface3:#262a33;--line:rgba(255,255,255,.065);
-  --text:#eef0f4;--dim:#8e95a3;--dim2:#5a6170;--accent:#f5b544;--accent-soft:rgba(245,181,68,.13);--accent-ink:#1a1200;--danger:#e5484d;
-  --tabs-h:56px;--qa-h:100px;--sab:env(safe-area-inset-bottom,0px);--sat:env(safe-area-inset-top,0px);
+  --bg:#0c0e13;--surface:#151821;--surface2:#1d212b;--surface3:#282d39;--line:rgba(255,255,255,.07);
+  --text:#f1f2f6;--dim:#8f97a8;--dim2:#5b6273;--accent:#f6b83f;--accent-soft:rgba(246,184,63,.14);--accent-ink:#1c1300;
+  --danger:#ef4f55;--ok:#4cc38a;
+  --tabs-h:64px;--qa-h:104px;--sab:env(safe-area-inset-bottom,0px);--sat:env(safe-area-inset-top,0px);
+  --r:18px;--rs:12px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font:15px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overscroll-behavior:none}
-body{overflow:hidden;font-variant-numeric:tabular-nums}
+body{overflow:hidden;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;touch-action:manipulation}
 input,textarea{font:inherit;color:inherit}
-kbd{font:inherit;background:var(--surface2);padding:1px 6px;border-radius:5px;color:var(--text)}
+kbd{font:inherit;background:var(--surface2);padding:1px 7px;border-radius:6px;color:var(--text);font-weight:600}
 b{font-weight:700}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
 .view{flex:1;min-height:0;display:flex;flex-direction:column}
 .view[hidden]{display:none}
-.hdr{flex:none;padding:calc(var(--sat) + 12px) 16px 8px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.hdr h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.01em}
-.hdr .sub{color:var(--dim);font-size:13px;white-space:nowrap}
 
-/* store chips */
-.chips{flex:none;display:flex;gap:6px;padding:calc(var(--sat) + 10px) 12px 10px;overflow-x:auto;scrollbar-width:none}
+/* ---------- large-title headers ---------- */
+.hdr{flex:none;padding:calc(var(--sat) + 18px) 20px 10px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.hdr h1{font-size:28px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1}
+.hdr .sub{color:var(--dim);font-size:13px;white-space:nowrap;padding-bottom:3px}
+
+/* ---------- store switcher ---------- */
+.chips{flex:none;display:flex;gap:6px;padding:calc(var(--sat) + 12px) 16px 6px;overflow-x:auto;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;height:36px;padding:0 13px;border-radius:18px;background:var(--surface2);color:var(--dim);
-  font-weight:600;font-size:14px;display:flex;align-items:center;gap:7px;transition:background 120ms,color 120ms}
-.chip:active{background:var(--surface3)}
-.chip.active{color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px rgba(245,181,68,.35)}
+.chip{flex:none;height:38px;padding:0 14px;border-radius:19px;background:var(--surface);color:var(--dim);
+  font-weight:600;font-size:14px;display:flex;align-items:center;gap:7px;transition:background 140ms,color 140ms}
+.chip:active{background:var(--surface2)}
+.chip.active{color:var(--accent-ink);background:var(--accent)}
 .chip .n{font-size:11px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--surface3);color:var(--text);font-weight:700;display:inline-flex;align-items:center;justify-content:center}
-.chip.active .n{background:var(--accent);color:var(--accent-ink)}
-.stitle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px 8px;flex:none}
-.stitle h2{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stitle .sum{color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stitle .mode{height:32px;padding:0 10px 0 12px;border-radius:9px;background:var(--surface2);color:var(--dim);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px;flex:none}
-.stitle .mode svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2}
+.chip.active .n{background:rgba(0,0,0,.18);color:var(--accent-ink)}
+.stitle{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 20px 10px;flex:none}
+.stitle h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stitle .sum{margin-top:5px;display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);white-space:nowrap}
+.stitle .sum .lg{display:inline-flex;align-items:center;gap:5px}
+.stitle .sum .lg::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dim2)}
+.stitle .sum .lg.now{color:var(--accent);font-weight:600}
+.stitle .sum .lg.now::before{background:var(--accent)}
+.stitle .mode{width:44px;height:44px;border-radius:14px;background:var(--surface);color:var(--dim);display:inline-flex;align-items:center;justify-content:center;flex:none;margin-top:-4px;transition:background 140ms,color 140ms}
+.stitle .mode.all{background:var(--accent-soft);color:var(--accent)}
+.stitle .mode svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 
-/* store sheets */
+/* ---------- store sheets ---------- */
 .track-wrap{flex:1;min-height:0;overflow:hidden;position:relative}
 .track{display:flex;height:100%;width:100%;touch-action:pan-y;will-change:transform}
-.pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;position:relative}
-.colhead{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;height:28px;padding:0 12px 0 16px;
-  font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim2);border-bottom:1px solid var(--line)}
-.colhead .c-last{width:52px}
-.colhead .c-prod{flex:1}
-.colhead .c-now{width:140px;text-align:center;color:var(--accent);opacity:.9}
-.cat{position:sticky;top:28px;z-index:1;background:var(--bg);padding:16px 16px 6px;font-size:11.5px;font-weight:700;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;position:relative;padding:0 12px 16px}
+.group{background:var(--surface);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.cat{position:sticky;top:0;z-index:1;background:var(--bg);padding:8px 8px 8px;font-size:12px;font-weight:700;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
 .rw{position:relative;overflow:hidden}
+.rw + .rw .row::before{content:"";position:absolute;left:14px;right:0;top:0;height:1px;background:var(--line)}
 .rw .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;
   background:var(--danger);color:#fff;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;opacity:0}
 .rw.swiping .under{opacity:1}
-.row{position:relative;display:flex;align-items:center;height:60px;padding:0 12px 0 16px;background:var(--bg);
-  user-select:none;-webkit-user-select:none}
-.row::after{content:"";position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line)}
-.row .prev{width:52px;flex:none;display:flex;align-items:center}
-.row .prev span{min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:var(--surface2);color:var(--dim);font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
-.row .body{flex:1;min-width:0;padding-right:10px}
+.row{position:relative;display:flex;align-items:center;height:62px;padding:0 10px 0 12px;background:var(--surface);
+  user-select:none;-webkit user-select:none}
+.row .prev{width:46px;flex:none;display:flex;align-items:center;justify-content:center}
+.row .prev span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 6px;border-radius:10px;background:var(--surface2);color:var(--dim);line-height:1}
+.row .prev span b{font-size:15px;font-weight:700;color:var(--text);opacity:.75}
+.row .prev span i{font-style:normal;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;color:var(--dim)}
+.row .body{flex:1;min-width:0;padding:0 10px 0 8px}
 .row .name{font-size:15.5px;font-weight:500;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.005em}
-.row.on .name{color:var(--text);font-weight:600}
-.row .item{font-size:11.5px;color:var(--dim2);margin-top:3px;letter-spacing:.05em}
+.row.on .name{color:var(--text);font-weight:650}
+.row .item{font-size:11.5px;color:var(--dim2);margin-top:3px;letter-spacing:.06em}
 .row .item .noitem{font-style:italic;letter-spacing:0}
-.qc{display:flex;align-items:center;width:140px;height:44px;flex:none;border-radius:13px;background:var(--surface);justify-content:space-between}
-.st{width:44px;height:44px;border-radius:13px;color:var(--dim);font-size:22px;font-weight:400;
-  display:flex;align-items:center;justify-content:center;line-height:1;transition:transform 80ms,background 80ms}
-.st:active{background:var(--surface3);color:var(--text);transform:scale(.92)}
-.cur{width:44px;text-align:center;font-size:19px;font-weight:700;color:var(--dim2)}
-.row.on .qc{background:var(--surface2)}
+.qc{display:flex;align-items:center;width:138px;height:44px;flex:none;border-radius:22px;background:transparent;box-shadow:inset 0 0 0 1px var(--line);justify-content:space-between;transition:background 140ms,box-shadow 140ms}
+.row.on .qc{background:var(--surface2);box-shadow:inset 0 0 0 1px rgba(246,184,63,.28)}
+.st{width:44px;height:44px;border-radius:22px;color:var(--dim);display:flex;align-items:center;justify-content:center;transition:transform 80ms,background 80ms}
+.st svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
+.st:active{background:var(--surface3);color:var(--text);transform:scale(.9)}
+.row.on .st{color:var(--text)}
+.cur{width:44px;text-align:center;font-size:18px;font-weight:800;color:var(--dim2);letter-spacing:-.02em}
 .row.on .cur{color:var(--accent)}
-.cur.bump{animation:bump 170ms ease-out}
-@keyframes bump{0%{transform:scale(1.3)}100%{transform:scale(1)}}
-.rw.flash .row{animation:flash 600ms ease-out}
-@keyframes flash{0%{background:var(--surface2)}100%{background:var(--bg)}}
-.empty{padding:44px 28px;color:var(--dim);text-align:center;line-height:1.55;font-size:14px}
-.empty svg{width:40px;height:40px;stroke:var(--dim2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:14px}
+.cur.bump{animation:bump 180ms cubic-bezier(.2,.8,.2,1)}
+@keyframes bump{0%{transform:scale(1.35)}100%{transform:scale(1)}}
+.rw.flash .row{animation:flash 700ms ease-out}
+@keyframes flash{0%{background:var(--surface3)}100%{background:var(--surface)}}
+.empty{padding:44px 24px;color:var(--dim);text-align:center;line-height:1.55;font-size:14px}
+.empty .ico{width:64px;height:64px;border-radius:20px;background:var(--surface);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px}
+.empty .ico svg{width:28px;height:28px;stroke:var(--dim);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .empty b{color:var(--text)}
-.empty .link{display:inline-block;margin-top:14px;color:var(--accent);font-weight:600;height:44px;line-height:44px;padding:0 12px}
+.empty .link{display:inline-flex;align-items:center;gap:6px;margin-top:16px;color:var(--accent);font-weight:600;height:44px;padding:0 16px;border-radius:12px;background:var(--accent-soft)}
 
-/* quick add */
-.qa{flex:none;background:var(--surface);border-top:1px solid var(--line);padding:4px 12px 8px;height:var(--qa-h)}
-.qa-row{position:relative}
-.qa-row .plus{position:absolute;left:14px;top:0;height:48px;display:flex;align-items:center;color:var(--dim2);font-size:20px;pointer-events:none}
-.sugg{height:36px;display:flex;gap:6px;overflow-x:auto;align-items:center;scrollbar-width:none}
+/* ---------- quick add composer ---------- */
+.qa{flex:none;background:var(--bg);padding:0 12px 10px;height:var(--qa-h);display:flex;flex-direction:column;justify-content:flex-end}
+.qa[hidden]{display:none}
+.sugg{height:40px;display:flex;gap:6px;overflow-x:auto;align-items:center;scrollbar-width:none;padding:0 2px}
 .sugg::-webkit-scrollbar{display:none}
 .sugg .hint{color:var(--dim2);font-size:12.5px;white-space:nowrap}
-.sugg .hint kbd{background:var(--surface2);color:var(--dim)}
-.sugg .ok{color:var(--dim);font-size:13.5px;white-space:nowrap}
+.sugg .hint kbd{background:var(--surface);color:var(--dim)}
+.sugg .ok{color:var(--dim);font-size:13.5px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .sugg .ok b{color:var(--accent)}
-.sg{flex:none;height:30px;padding:0 6px 0 11px;border-radius:9px;background:var(--surface2);color:var(--text);font-size:13.5px;
+.sugg .ok::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--ok);flex:none;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5L20 7'/></svg>") center/12px no-repeat,linear-gradient(#000,#000);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+.sg{flex:none;height:32px;padding:0 6px 0 12px;border-radius:16px;background:var(--surface2);color:var(--text);font-size:13.5px;
   display:flex;align-items:center;gap:7px;white-space:nowrap;font-weight:500}
 .sg.first{background:var(--accent);color:var(--accent-ink);font-weight:600}
-.sg .q{font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.09)}
-.sg.first .q{background:rgba(0,0,0,.14)}
-.sg.create{padding-right:11px}
-.sg.undo{color:var(--accent);font-weight:700;margin-left:auto}
-.qa-row{display:flex;gap:8px;margin-top:4px}
-.qa-row input{flex:1;min-width:0;height:48px;border-radius:13px;border:1px solid transparent;background:var(--bg);padding:0 14px 0 36px;font-size:16px;outline:none;transition:border-color 120ms}
-.qa-row input:focus{border-color:rgba(245,181,68,.5)}
+.sg .q{font-size:11.5px;font-weight:700;min-width:22px;height:20px;padding:0 6px;border-radius:10px;background:rgba(255,255,255,.09);display:inline-flex;align-items:center;justify-content:center}
+.sg.first .q{background:rgba(0,0,0,.16)}
+.sg.create,.sg.undo{padding-right:12px}
+.sg.undo{color:var(--accent);font-weight:700;margin-left:auto;background:var(--accent-soft)}
+.qa-row{position:relative;display:flex;margin-top:2px}
+.qa-row .plus{position:absolute;left:16px;top:0;height:52px;display:flex;align-items:center;color:var(--dim2);pointer-events:none}
+.qa-row .plus svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.qa-row input{flex:1;min-width:0;height:52px;border-radius:26px;border:1px solid var(--line);background:var(--surface);padding:0 60px 0 44px;font-size:16px;outline:none;transition:border-color 120ms,background 120ms}
+.qa-row input:focus{border-color:rgba(246,184,63,.55);background:var(--surface2)}
 .qa-row input::placeholder{color:var(--dim2)}
-.qa-row button{width:68px;height:48px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:15px}
-.qa-row button:active{filter:brightness(1.1)}
+.qa-row button{position:absolute;right:5px;top:5px;width:42px;height:42px;border-radius:21px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;transition:transform 80ms}
+.qa-row button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.qa-row button:active{transform:scale(.9)}
 
-/* tabs */
-.tabs{flex:none;display:flex;height:calc(var(--tabs-h) + var(--sab));padding-bottom:var(--sab);background:var(--surface);border-top:1px solid var(--line)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--dim2);font-size:10.5px;font-weight:600;letter-spacing:.02em}
-.tab svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* ---------- tab bar ---------- */
+.tabs{flex:none;display:flex;height:calc(var(--tabs-h) + var(--sab));padding:6px 8px var(--sab);background:var(--surface);border-top:1px solid var(--line)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--dim);font-size:11px;font-weight:600;letter-spacing:.01em}
+.tab svg{width:56px;height:30px;padding:4px 16px;border-radius:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:background 160ms}
 .tab.active{color:var(--accent)}
-.tab.active svg{stroke-width:2.1}
+.tab.active svg{background:var(--accent-soft);stroke-width:2.2}
 
-/* toast */
+/* ---------- toast ---------- */
 .toast{position:absolute;left:12px;right:12px;bottom:calc(var(--tabs-h) + var(--sab) + 10px);z-index:50;background:var(--surface3);
-  color:var(--text);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  color:var(--text);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .toast[hidden]{display:none}
-body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 10px)}
+body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 4px)}
 .toast .msg{flex:1;min-width:0}
 .toast button{color:var(--accent);font-weight:700;height:44px;padding:0 10px;margin:-10px -10px -10px 0}
 .toast button[hidden]{display:none}
 
-/* overlays */
-.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;flex-direction:column;justify-content:flex-end}
-.sheet{background:var(--surface);border-radius:18px 18px 0 0;max-height:92%;display:flex;flex-direction:column;padding-bottom:var(--sab);will-change:transform}
+/* ---------- sheets ---------- */
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.62);z-index:60;display:flex;flex-direction:column;justify-content:flex-end}
+.sheet{background:var(--surface);border-radius:22px 22px 0 0;max-height:92%;display:flex;flex-direction:column;padding-bottom:var(--sab);will-change:transform}
 .sheet.full{height:100%;max-height:100%;border-radius:0;background:var(--bg);padding-top:var(--sat)}
-.sheet-head{padding:8px 16px 6px;touch-action:none;flex:none;user-select:none;-webkit-user-select:none}
-.handle{width:40px;height:4px;border-radius:2px;background:var(--dim2);margin:0 auto 12px}
-.sheet-title{font-weight:700;font-size:17px}
-.sheet-sub{color:var(--dim);font-size:13px;margin-top:2px}
-.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 16px 16px;flex:1;min-height:0}
-.sheet.enter{animation:up 220ms cubic-bezier(.2,.7,.2,1)}
+.sheet-head{padding:10px 20px 8px;touch-action:none;flex:none;user-select:none;-webkit-user-select:none}
+.handle{width:36px;height:5px;border-radius:3px;background:var(--surface3);margin:0 auto 14px}
+.sheet-title{font-weight:800;font-size:20px;letter-spacing:-.01em}
+.sheet-sub{color:var(--dim);font-size:13px;margin-top:3px}
+.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 20px 20px;flex:1;min-height:0}
+.sheet.enter{animation:up 240ms cubic-bezier(.2,.7,.2,1)}
 @keyframes up{from{transform:translateY(100%)}}
 
-/* buttons & forms */
-.btn{height:48px;padding:0 18px;border-radius:12px;background:var(--surface2);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+/* ---------- buttons & forms ---------- */
+.btn{height:50px;padding:0 18px;border-radius:14px;background:var(--surface2);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;transition:transform 80ms,filter 80ms}
+.btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .btn.primary{background:var(--accent);color:var(--accent-ink)}
 .btn.danger{background:var(--danger);color:#fff}
 .btn.ghost{background:transparent;color:var(--dim)}
 .btn.block{width:100%}
-.btn:active{filter:brightness(1.15)}
+.btn:active{transform:scale(.97);filter:brightness(1.1)}
 .btn[disabled]{opacity:.4}
-.btnrow{display:flex;gap:8px;margin-top:12px}
+.btnrow{display:flex;gap:8px;margin-top:14px}
 .btnrow .btn{flex:1}
-.fld{display:block;margin-bottom:12px}
-.fld > span{display:block;font-size:12px;color:var(--dim);margin-bottom:5px;font-weight:600}
-.fld input,.fld textarea{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 12px;font-size:16px;outline:none}
-.fld textarea{height:auto;min-height:110px;padding:10px 12px;resize:vertical;line-height:1.4}
-.fld input:focus,.fld textarea:focus{border-color:var(--accent)}
-.fld .help{font-size:12px;color:var(--dim2);margin-top:5px;line-height:1.4}
+.fld{display:block;margin-bottom:14px}
+.fld > span{display:block;font-size:12px;color:var(--dim);margin-bottom:6px;font-weight:600}
+.fld input,.fld textarea{width:100%;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;font-size:16px;outline:none}
+.fld textarea{height:auto;min-height:110px;padding:10px 14px;resize:vertical;line-height:1.4}
+.fld input:focus,.fld textarea:focus{border-color:rgba(246,184,63,.55)}
+.fld .help{font-size:12px;color:var(--dim2);margin-top:6px;line-height:1.4}
 .fld .help code{color:var(--dim)}
 
-/* master */
-.mlist{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;position:relative;-webkit-overflow-scrolling:touch}
+/* ---------- master ---------- */
+.mlist{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;position:relative;-webkit-overflow-scrolling:touch;padding:0 12px 16px}
 .ptr{height:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;color:var(--dim);font-size:12px;padding-bottom:8px;will-change:height}
 .ptr.spin{transition:height 180ms ease}
-.mrow{position:relative;display:flex;align-items:center;padding:12px 16px;gap:12px;min-height:60px}
-.mrow::after{content:"";position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line)}
+.hero{display:flex;gap:10px;margin-bottom:12px}
+.hero .stat{flex:1;background:var(--surface);border-radius:var(--r);padding:14px 16px}
+.hero .stat .v{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.hero .stat.acc .v{color:var(--accent)}
+.hero .stat .l{font-size:12px;color:var(--dim);margin-top:5px;font-weight:600}
+.mrow{position:relative;display:flex;align-items:center;padding:12px 12px 12px 16px;gap:12px;min-height:64px;background:var(--surface)}
+.mrow + .mrow::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
 .mrow .body{flex:1;min-width:0}
-.mrow .name{font-weight:600;font-size:15.5px;letter-spacing:-.005em}
-.mrow .item{font-size:11.5px;color:var(--dim2);letter-spacing:.05em;margin-top:2px}
-.mrow .by{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
-.mrow .by span{font-size:11.5px;color:var(--dim);background:var(--surface2);border-radius:6px;padding:2px 7px;font-weight:500}
-.mrow .by span b{color:var(--text);font-weight:700;margin-left:3px}
-.mrow .tot{font-size:26px;font-weight:700;color:var(--accent);min-width:52px;text-align:right;letter-spacing:-.02em}
-.actions{flex:none;display:flex;gap:8px;padding:8px 12px;background:var(--surface);border-top:1px solid var(--line)}
+.mrow .name{font-weight:650;font-size:15.5px;letter-spacing:-.005em}
+.mrow .item{font-size:11.5px;color:var(--dim2);letter-spacing:.06em;margin-top:2px}
+.mrow .by{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.mrow .by span{font-size:11.5px;color:var(--dim);background:var(--surface2);border-radius:7px;padding:3px 8px;font-weight:500}
+.mrow .by span b{color:var(--text);font-weight:700;margin-left:4px}
+.mrow .tot{min-width:52px;height:44px;padding:0 10px;border-radius:12px;background:var(--accent-soft);color:var(--accent);font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.actions{flex:none;display:flex;gap:8px;padding:8px 12px 10px;background:var(--bg)}
 .actions .btn{flex:1}
 
-/* step-through */
-.step{display:flex;flex-direction:column;height:100%;padding:0 16px;gap:12px}
-.step .pos{color:var(--dim);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
-.step .pname{font-size:22px;font-weight:700;line-height:1.2;min-height:54px}
-.step .pcat{color:var(--dim);font-size:13px;margin-top:2px}
-.big{flex:1;min-height:0;border-radius:18px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:12px}
-.big .lbl{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.big .val{font-size:44px;font-weight:700;letter-spacing:.01em;line-height:1.1}
-.big .val.missing{font-size:18px;color:var(--dim);font-weight:500;font-style:italic}
-.big.cases .val{color:var(--accent);font-size:64px}
-.big .tip{font-size:12px;color:var(--dim2)}
+/* ---------- step-through ---------- */
+.step{display:flex;flex-direction:column;height:100%;padding:0 20px;gap:12px}
+.step .pos{color:var(--dim);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.step .pname{font-size:24px;font-weight:800;line-height:1.15;min-height:56px;letter-spacing:-.02em;margin-top:4px}
+.step .pcat{color:var(--dim);font-size:13px;margin-top:4px}
+.big{flex:1;min-height:0;border-radius:22px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:12px;transition:background 120ms,box-shadow 120ms}
+.big .lbl{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.big .val{font-size:46px;font-weight:800;letter-spacing:.01em;line-height:1.1}
+.big .val.missing{font-size:17px;color:var(--dim);font-weight:500;font-style:italic}
+.big.cases .val{color:var(--accent);font-size:68px;letter-spacing:-.03em}
+.big .tip{font-size:12px;color:var(--dim2);display:inline-flex;align-items:center;gap:5px}
+.big .tip svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .big:active{background:var(--surface2)}
-.big.copied{background:var(--surface2);outline:2px solid var(--accent)}
-.big.copied .tip{color:var(--accent);font-weight:600}
-.step .nav{display:flex;gap:8px;padding-bottom:8px}
+.big.copied{background:var(--surface2);box-shadow:inset 0 0 0 2px var(--accent)}
+.big.copied .tip{color:var(--ok);font-weight:700}
+.step .nav{display:flex;gap:8px;padding-bottom:10px}
 .step .nav .btn{flex:1;height:56px;font-size:16px}
 .step .nav .btn.primary{flex:2}
 
-/* cutoffs */
-.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:24px}
-.card{background:var(--surface);border-radius:16px;padding:16px;margin:0 16px 12px}
+/* ---------- cutoffs ---------- */
+.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding:0 12px 24px}
+.card{background:var(--surface);border-radius:var(--r);padding:16px 18px;margin:0 0 12px}
 .card .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-weight:700;display:flex;align-items:center;gap:8px}
-.card .k .tag{background:var(--accent);color:var(--accent-ink);border-radius:5px;padding:2px 6px;font-size:10px}
-.card .big2{font-size:34px;font-weight:700;margin:6px 0 2px;letter-spacing:-.02em}
-.card.next{box-shadow:inset 0 0 0 1px rgba(245,181,68,.3)}
+.card .k .tag{background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:2px 7px;font-size:10px}
+.card .big2{font-size:38px;font-weight:800;margin:8px 0 4px;letter-spacing:-.03em;line-height:1}
+.card.next{background:linear-gradient(0deg,var(--surface),var(--surface));box-shadow:inset 0 0 0 1px rgba(246,184,63,.35)}
 .card.next .big2{color:var(--accent)}
-.card .when{color:var(--dim);font-size:14px}
+.card .when{color:var(--dim);font-size:13.5px;line-height:1.45}
 .card .when b{color:var(--text);font-weight:600}
-.card .row2{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
-.card p{margin:8px 0 0;color:var(--dim);font-size:13.5px;line-height:1.45}
+.tl{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;color:var(--dim)}
+.tl .pt{display:flex;flex-direction:column;gap:2px}
+.tl .pt b{color:var(--text);font-weight:600;font-size:13.5px}
+.tl .ln{flex:1;height:1px;background:var(--line);position:relative}
+.tl .ln::after{content:"";position:absolute;right:-1px;top:-3px;border:3.5px solid transparent;border-left-color:var(--dim2)}
+.card .row2{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.card p{margin:8px 0 0;color:var(--dim);font-size:13.5px;line-height:1.5}
 .card p b{color:var(--text)}
-.check{height:44px;padding:0 14px;border-radius:12px;background:var(--surface2);display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--dim)}
-.check svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.check.on{background:var(--accent);color:var(--accent-ink)}
-.note{margin:0 16px 12px;color:var(--dim2);font-size:12.5px;line-height:1.45}
+.check{height:44px;padding:0 14px;border-radius:12px;background:var(--surface2);display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--dim);transition:background 140ms,color 140ms}
+.check svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.check.on{background:var(--ok);color:#03150c}
+.note{margin:2px 6px 14px;color:var(--dim2);font-size:12.5px;line-height:1.5;display:flex;gap:8px}
+.note svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;margin-top:1px}
 
-/* setup */
-.sec{padding:16px 16px 6px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+/* ---------- setup ---------- */
+.sec{padding:18px 8px 8px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .sec .btn{height:32px;padding:0 12px;font-size:12px;text-transform:none;letter-spacing:0}
-.li{position:relative;display:flex;align-items:center;min-height:56px;padding:6px 16px;gap:10px;width:100%;text-align:left}
-.li::after{content:"";position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line)}
-button.li:active{background:var(--surface)}
+.li{position:relative;display:flex;align-items:center;min-height:56px;padding:6px 14px 6px 16px;gap:10px;width:100%;text-align:left;background:var(--surface)}
+.li + .li::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+button.li:active{background:var(--surface2)}
 .li .body{flex:1;min-width:0}
-.li .name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .li .meta{font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .li .chev{color:var(--dim2)}
-.li input{height:40px;border-radius:9px;border:1px solid var(--line);background:var(--bg);padding:0 10px;font-size:15px;outline:none;min-width:0}
-.li input:focus{border-color:var(--accent)}
-.li input.short{width:76px;flex:none;text-align:center}
+.li .chev svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.li input{height:40px;border-radius:10px;border:1px solid transparent;background:var(--bg);padding:0 10px;font-size:15px;outline:none;min-width:0}
+.li input:focus{border-color:rgba(246,184,63,.55)}
+.li input.short{width:76px;flex:none;text-align:center;font-weight:700}
 .li input.long{flex:1}
-.stack{display:flex;gap:8px;flex-wrap:wrap;padding:6px 16px 8px}
+.stack{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0 8px}
 .stack .btn{flex:1 1 auto}
 .pad{padding:6px 16px 8px}
-.search{padding:6px 16px 8px}
-.search input{width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;font-size:16px;outline:none}
-.search input:focus{border-color:var(--accent)}
+.search{padding:0 0 8px}
+.search input{width:100%;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--surface);padding:0 16px;font-size:16px;outline:none}
+.search input:focus{border-color:rgba(246,184,63,.55)}
 .filebtn{position:relative;overflow:hidden}
 .filebtn input{position:absolute;inset:0;opacity:0;font-size:0}
 
@@ -250,10 +279,10 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').ca
 
   <section class="view" id="view-master" hidden>
     <div class="hdr"><h1>Master</h1><div class="sub" id="master-sub"></div></div>
-    <div class="mlist" id="mlist"><div class="ptr" id="ptr">Refreshing totals…</div><div id="mrows"></div></div>
+    <div class="mlist" id="mlist"><div class="ptr" id="ptr">Refreshing totals…</div><div class="hero" id="master-hero"></div><div class="group" id="mrows"></div></div>
     <div class="actions">
-      <button class="btn" id="btn-copyall">Copy all</button>
-      <button class="btn primary" id="btn-step">Step through for OTS</button>
+      <button class="btn" id="btn-copyall"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy all</button>
+      <button class="btn primary" id="btn-step"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Step through for OTS</button>
     </div>
   </section>
 
@@ -269,9 +298,9 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').ca
 
   <form class="qa" id="qa" autocomplete="off">
     <div class="sugg" id="sugg"></div>
-    <div class="qa-row"><span class="plus">+</span>
+    <div class="qa-row"><span class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
       <input id="qa-in" type="text" inputmode="text" enterkeyhint="go" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Add to store…">
-      <button type="submit" id="qa-go">Add</button>
+      <button type="submit" id="qa-go" aria-label="Add"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
     </div>
   </form>
 
@@ -485,7 +514,7 @@ let idx = 0;
 const HINT = '<span class="hint"><kbd>ccc 4</kbd> = 4 cases · a bare name = 1 case · item # works too</span>';
 
 function buildTrack() {
-  track.innerHTML = S.stores.map(s => `<div class="pane" data-sid="${s.id}"><div class="stitle"><div style="min-width:0"><h2>${esc(s.name)}</h2><div class="sum"></div></div><button type="button" class="mode"></button></div><div class="colhead"><div class="c-last">Last</div><div class="c-prod">Product</div><div class="c-now">This order</div></div><div class="list"></div></div>`).join('');
+  track.innerHTML = S.stores.map(s => `<div class="pane" data-sid="${s.id}"><div class="stitle"><div style="min-width:0;flex:1"><h2>${esc(s.name)}</h2><div class="sum"></div></div><button type="button" class="mode"></button></div><div class="list"></div></div>`).join('');
   S.stores.forEach(s => dirty.add(s.id));
   idx = Math.max(0, S.stores.findIndex(s => s.id === S.ui.store));
   updateModeButtons();
@@ -493,15 +522,17 @@ function buildTrack() {
 }
 const paneEl = sid => track.querySelector(`.pane[data-sid="${sid}"]`);
 function updateModeButtons() {
-  const label = S.ui.showAll ? 'Catalog' : 'On order';
-  $$('.stitle .mode', track).forEach(b => b.innerHTML = `${label} <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`);
+  const all = S.ui.showAll;
+  $$('.stitle .mode', track).forEach(b => { b.classList.toggle('all', all); b.setAttribute('aria-label', all ? 'Showing whole catalog — tap for order only' : 'Showing order only — tap for whole catalog'); b.innerHTML = all
+    ? `<svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`
+    : `<svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>`; });
 }
 function updateSummary(sid) {
   const pane = paneEl(sid); if (!pane) return;
   const cur = S.orders.current[sid] || {}, prev = S.orders.previous[sid] || {};
   const c = Object.values(cur).reduce((a, b) => a + b, 0), n = Object.keys(cur).length;
   const pc = Object.values(prev).reduce((a, b) => a + b, 0);
-  pane.querySelector('.stitle .sum').textContent = (n ? `${c} case${c === 1 ? '' : 's'} · ${n} line${n === 1 ? '' : 's'} this order` : 'Nothing on this order yet') + (pc ? ` · ${pc} last` : '');
+  pane.querySelector('.stitle .sum').innerHTML = `<span class="lg now">This order · ${n ? `${c} case${c === 1 ? '' : 's'}` : 'empty'}</span><span class="lg">Last · ${pc ? pc + ' case' + (pc === 1 ? '' : 's') : 'none'}</span>`;
 }
 function renderChips() {
   chips.innerHTML = S.stores.map((s, i) => { const n = lineCount(s.id); return `<button type="button" class="chip${i === idx ? ' active' : ''}" data-i="${i}">${esc(s.short)}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
@@ -512,9 +543,9 @@ chips.addEventListener('click', e => { const c = e.target.closest('.chip'); if (
 
 function rowHTML(p, prev, cur) {
   return `<div class="rw" data-pid="${p.id}"><div class="under">Clear</div><div class="row${cur > 0 ? ' on' : ''}">
-<div class="prev">${prev > 0 ? `<span>${prev}</span>` : ''}</div>
+<div class="prev">${prev > 0 ? `<span><b>${prev}</b><i>last</i></span>` : ''}</div>
 <div class="body"><div class="name">${esc(p.name)}</div><div class="item">${p.item ? esc(p.item) : '<span class="noitem">no item #</span>'}</div></div>
-<div class="qc"><button type="button" class="st" data-d="-1" aria-label="one less">−</button><div class="cur">${cur}</div><button type="button" class="st" data-d="1" aria-label="one more">+</button></div>
+<div class="qc"><button type="button" class="st" data-d="-1" aria-label="one less"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><div class="cur">${cur}</div><button type="button" class="st" data-d="1" aria-label="one more"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
 </div></div>`;
 }
 function renderPane(sid) {
@@ -525,16 +556,17 @@ function renderPane(sid) {
   if (S.ui.showAll) {
     const groups = new Map();
     for (const p of S.products) { const c = p.category || 'Uncategorized'; if (!groups.has(c)) groups.set(c, []); groups.get(c).push(p); }
-    for (const [c, ps] of groups) { html += `<div class="cat">${esc(c)}</div>`; for (const p of ps) html += rowHTML(p, prev[p.id] || 0, cur[p.id] || 0); }
+    for (const [c, ps] of groups) { html += `<div class="cat">${esc(c)}</div><div class="group">`; for (const p of ps) html += rowHTML(p, prev[p.id] || 0, cur[p.id] || 0); html += '</div>'; }
     if (!S.products.length) html = `<div class="empty">No products yet.<br>Add them in <b>Setup</b>, or just type a name below and tap <b>Create</b>.</div>`;
   } else {
     const byId = productMap(); const seen = new Set(); const ids = [];
     for (const pid in prev) if (!seen.has(pid)) { seen.add(pid); ids.push(pid); }
     for (const pid in cur) if (!seen.has(pid)) { seen.add(pid); ids.push(pid); }
     for (const pid of ids) { const p = byId.get(pid); if (p) html += rowHTML(p, prev[pid] || 0, cur[pid] || 0); }
+    if (html) html = `<div class="group">${html}</div>`;
     if (!html) {
       const st = storeById(sid);
-      html = `<div class="empty"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><path d="M17 15v6M14 18h6"/></svg><br>Nothing on the order for <b>${esc(st ? st.name : '')}</b> yet.<br><br>Type a product in the box below. <kbd>ccc 4</kbd> adds 4 cases of Lance Ccc; a bare name like <kbd>nekot</kbd> adds 1 case.<br><button type="button" class="link mode">Browse the whole catalog instead</button></div>`;
+      html = `<div class="empty"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><path d="M17 15v6M14 18h6"/></svg></div><br>Nothing on the order for <b>${esc(st ? st.name : '')}</b> yet.<br><br>Type a product in the box below — <kbd>ccc 4</kbd> adds 4 cases of Lance Ccc, a bare name like <kbd>nekot</kbd> adds 1.<br><button type="button" class="link mode"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Browse the whole catalog</button></div>`;
     }
   }
   list.innerHTML = html;
@@ -719,9 +751,11 @@ function masterRows() {
 function renderMaster() {
   const rows = masterRows();
   const cases = rows.reduce((a, r) => a + r.total, 0);
-  $('#master-sub').textContent = rows.length ? `${rows.length} products · ${cases} cases` : 'this order';
+  $('#master-sub').textContent = 'this order · all stores';
+  const stores = new Set(); rows.forEach(r => r.by.forEach(([sid]) => stores.add(sid)));
+  $('#master-hero').innerHTML = `<div class="stat acc"><div class="v">${cases}</div><div class="l">cases</div></div><div class="stat"><div class="v">${rows.length}</div><div class="l">products</div></div><div class="stat"><div class="v">${stores.size}<span style="font-size:16px;color:var(--dim2)">/${S.stores.length}</span></div><div class="l">stores</div></div>`;
   $('#mrows').innerHTML = rows.length ? rows.map(r => `<div class="mrow"><div class="body"><div class="name">${esc(r.product.name)}</div><div class="item">${r.product.item ? esc(r.product.item) : '<i>no item #</i>'}</div><div class="by">${r.by.map(([sid, q]) => { const s = storeById(sid); return `<span>${esc(s ? s.short : sid)}<b>${q}</b></span>`; }).join('')}</div></div><div class="tot">${r.total}</div></div>`).join('')
-    : `<div class="empty"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><br>Nothing on this order yet.<br>Add items on the <b>Stores</b> tab and the totals across all ${S.stores.length} stores show up here.<br><span style="color:var(--dim2);font-size:12.5px">Last order's numbers are never counted here.</span></div>`;
+    : `<div class="empty"><div class="ico"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><br>Nothing on this order yet.<br>Add items on the <b>Stores</b> tab and the totals across all ${S.stores.length} stores show up here.<br><span style="color:var(--dim2);font-size:12.5px">Last order's numbers are never counted here.</span></div>`;
   $('#btn-step').disabled = !rows.length; $('#btn-copyall').disabled = !rows.length;
 }
 function masterText() {
@@ -762,8 +796,8 @@ function openStep() {
   let k = 0;
   const sh = openSheet({ full: true, html: `<div class="step" id="step">
 <div><div class="pos" id="st-pos"></div><div class="pname" id="st-name"></div><div class="pcat" id="st-cat"></div></div>
-<button type="button" class="big" id="st-item"><div class="lbl">Item number</div><div class="val" id="st-item-v"></div><div class="tip">tap to copy</div></button>
-<button type="button" class="big cases" id="st-qty"><div class="lbl">Cases</div><div class="val" id="st-qty-v"></div><div class="tip">tap to copy</div></button>
+<button type="button" class="big" id="st-item"><div class="lbl">Item number</div><div class="val" id="st-item-v"></div><div class="tip"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>tap to copy</div></button>
+<button type="button" class="big cases" id="st-qty"><div class="lbl">Cases</div><div class="val" id="st-qty-v"></div><div class="tip"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>tap to copy</div></button>
 <div class="nav"><button type="button" class="btn" id="st-prev">‹ Prev</button><button type="button" class="btn primary" id="st-next">Next ›</button></div>
 </div>`, title: 'Key into OTS', sub: 'Swipe down to close · swipe sideways for next / prev' });
   const el = sh.el;
@@ -777,13 +811,13 @@ function openStep() {
     $('#st-qty-v', el).textContent = r.total;
     $('#st-prev', el).disabled = k === 0;
     $('#st-next', el).textContent = k === rows.length - 1 ? 'Done' : 'Next ›';
-    $$('.big', el).forEach(b => { b.classList.remove('copied'); b.querySelector('.tip').textContent = 'tap to copy'; });
+    $$('.big', el).forEach(b => { b.classList.remove('copied'); b.querySelector('.tip').lastChild.textContent = 'tap to copy'; });
   };
   const copyBlock = async (btn, text) => {
     if (!text) return;
     const ok = await copyText(text); vib();
-    btn.classList.add('copied'); btn.querySelector('.tip').textContent = ok ? 'Copied' : 'Copy failed';
-    setTimeout(() => { btn.classList.remove('copied'); btn.querySelector('.tip').textContent = 'tap to copy'; }, 900);
+    btn.classList.add('copied'); btn.querySelector('.tip').lastChild.textContent = ok ? 'Copied' : 'Copy failed';
+    setTimeout(() => { btn.classList.remove('copied'); btn.querySelector('.tip').lastChild.textContent = 'tap to copy'; }, 900);
   };
   $('#st-item', el).addEventListener('click', e => copyBlock(e.currentTarget, rows[k].product.item));
   $('#st-qty', el).addEventListener('click', e => copyBlock(e.currentTarget, String(rows[k].total)));
@@ -898,9 +932,9 @@ function renderCutoffs() {
   let html = cs.map((c, i) => {
     const iso = c.at.toISOString(); const sub = !!S.submitted[iso];
     const pickup = new Date(c.at.getTime() + c.pickupDays * 86400000);
-    return `<div class="card${i === 0 ? ' next' : ''}"><div class="k">${i === 0 ? '<span class="tag">Next</span>' : 'Then'} ${c.label} ET</div><div class="big2" data-cd="${c.at.getTime()}">${countdown(c.at - now)}</div><div class="when">${fmtLong.format(c.at)} → pickup <b>${fmtDay.format(pickup)}</b></div><div class="row2"><span style="color:var(--dim);font-size:13px">${sub ? 'Order submitted in OTS' : 'Not submitted yet'}</span><button type="button" class="check${sub ? ' on' : ''}" data-sub="${iso}"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>${sub ? 'Submitted' : 'Mark submitted'}</button></div></div>`;
+    return `<div class="card${i === 0 ? ' next' : ''}"><div class="k">${i === 0 ? '<span class="tag">Next</span>' : 'Then'} ${c.label} ET</div><div class="big2" data-cd="${c.at.getTime()}">${countdown(c.at - now)}</div><div class="tl"><div class="pt">Cutoff<b>${fmtLong.format(c.at)}</b></div><div class="ln"></div><div class="pt">Pickup<b>${fmtDay.format(pickup)}</b></div></div><div class="row2"><span style="color:var(--dim);font-size:13px">${sub ? 'Order submitted in OTS' : 'Not submitted yet'}</span><button type="button" class="check${sub ? ' on' : ''}" data-sub="${iso}"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>${sub ? 'Submitted' : 'Mark submitted'}</button></div></div>`;
   }).join('');
-  html += `<div class="note">This app can't wake your phone before a cutoff — there's no server behind it. Set a phone alarm for Monday and Friday evening.</div>`;
+  html += `<div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span>This app can't wake your phone before a cutoff — there's no server behind it. Set a phone alarm for Monday and Friday evening.</span></div>`;
   html += `<div class="card"><div class="k">Rollover</div><p>After you've keyed the order into OTS, roll it over: <b>this order</b> (${lines} products, ${cases} cases) becomes <b>last order</b> on every store sheet, and this order starts empty.</p><p>Only happens when you tap and confirm — never automatically.</p><div class="row2"><span style="color:var(--dim2);font-size:12.5px">${S.lastRollover ? 'Last rollover ' + fmtStamp.format(new Date(S.lastRollover)) : 'No rollover yet'}</span><button type="button" class="btn primary" id="btn-rollover"${lines ? '' : ' disabled'}>Roll over…</button></div>${S.rolloverBackup ? `<div class="btnrow"><button type="button" class="btn" id="btn-unroll">Undo last rollover</button></div>` : ''}</div>`;
   $('#cutoffs').innerHTML = html;
 }
@@ -940,23 +974,27 @@ function renderSetup() {
   const shown = q ? S.products.filter(p => scoreProduct(p, q) > 0 || norm(p.category).includes(q)) : S.products;
   $('#setup').innerHTML = `
 <div class="sec">Stores</div>
-${S.stores.map(s => `<div class="li"><input class="long" data-store="${s.id}" data-f="name" value="${esc(s.name)}" aria-label="store name"><input class="short" data-store="${s.id}" data-f="short" value="${esc(s.short)}" maxlength="6" aria-label="short label"></div>`).join('')}
-<div class="note" style="margin-top:8px">The short label is what the chips and the master list use.</div>
+<div class="group">${S.stores.map(s => `<div class="li"><input class="long" data-store="${s.id}" data-f="name" value="${esc(s.name)}" aria-label="store name"><input class="short" data-store="${s.id}" data-f="short" value="${esc(s.short)}" maxlength="6" aria-label="short label"></div>`).join('')}</div>
+<div class="note" style="margin-top:2px">The short label is what the chips and the master list use.</div>
 <div class="sec">Products <span>${cats.length} categories</span></div>
-<div class="stack"><button type="button" class="btn primary" id="btn-addprod">＋ Add product</button><button type="button" class="btn" id="btn-bulk">Bulk paste</button></div>
+<div class="stack"><button type="button" class="btn primary" id="btn-addprod"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add product</button><button type="button" class="btn" id="btn-bulk"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Bulk paste</button></div>
 <div class="search"><input type="search" id="setup-q" placeholder="Filter products…" value="${esc(setupFilter)}" autocomplete="off"></div>
-<div id="plist">${shown.map(p => `<button type="button" class="li" data-edit="${p.id}"><div class="body"><div class="name">${esc(p.name)}</div><div class="meta">${p.item ? esc(p.item) : '<i>no item #</i>'} · ${esc(p.category || 'Uncategorized')} · ${esc(p.aliases.join(', ') || 'no shorthand')}</div></div><span class="chev">›</span></button>`).join('') || '<div class="empty">No products match.</div>'}</div>
+<div id="plist" class="group">${plistHTML(shown)}</div>
 <div class="sec">Backup</div>
-<div class="stack"><button type="button" class="btn" id="btn-export">Download backup</button><button type="button" class="btn" id="btn-copyjson">Copy JSON</button></div>
+<div class="stack"><button type="button" class="btn" id="btn-export"><svg viewBox="0 0 24 24"><path d="M12 3v12M6 9l6 6 6-6M4 21h16"/></svg>Download backup</button><button type="button" class="btn" id="btn-copyjson">Copy JSON</button></div>
 <div class="stack"><label class="btn filebtn">Import backup file<input type="file" accept="application/json,.json" id="file-import"></label><button type="button" class="btn" id="btn-pastejson">Paste backup</button></div>
 <div class="note">Everything lives on this phone only. There's no sync — move data between phones with a backup file.</div>
 <div class="sec">Danger zone</div>
 <div class="stack"><button type="button" class="btn ghost" id="btn-reset">Reset to the starter catalog…</button></div>`;
 }
 let setupFilter = '';
+const CHEV = '<span class="chev"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>';
+function plistHTML(shown) {
+  return shown.map(p => `<button type="button" class="li" data-edit="${p.id}"><div class="body"><div class="name">${esc(p.name)}</div><div class="meta">${p.item ? esc(p.item) : '<i>no item #</i>'} · ${esc(p.category || 'Uncategorized')} · ${esc(p.aliases.join(', ') || 'no shorthand')}</div></div>${CHEV}</button>`).join('') || '<div class="empty">No products match.</div>';
+}
 const setupEl = $('#setup');
 setupEl.addEventListener('input', e => {
-  if (e.target.id === 'setup-q') { setupFilter = e.target.value; const q = norm(setupFilter); const shown = q ? S.products.filter(p => scoreProduct(p, q) > 0 || norm(p.category).includes(q)) : S.products; $('#plist').innerHTML = shown.map(p => `<button type="button" class="li" data-edit="${p.id}"><div class="body"><div class="name">${esc(p.name)}</div><div class="meta">${p.item ? esc(p.item) : '<i>no item #</i>'} · ${esc(p.category || 'Uncategorized')} · ${esc(p.aliases.join(', ') || 'no shorthand')}</div></div><span class="chev">›</span></button>`).join('') || '<div class="empty">No products match.</div>'; }
+  if (e.target.id === 'setup-q') { setupFilter = e.target.value; const q = norm(setupFilter); const shown = q ? S.products.filter(p => scoreProduct(p, q) > 0 || norm(p.category).includes(q)) : S.products; $('#plist').innerHTML = plistHTML(shown); }
 });
 setupEl.addEventListener('change', e => {
   const inp = e.target;
