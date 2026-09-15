@@ -44,6 +44,11 @@ Offsets are probed with `Intl.DateTimeFormat`, never hardcoded.
 Cache-first, app shell precached. **Bump `CACHE` in `sw.js` whenever any file
 changes.**
 
+## Hosting
+
+GitHub Pages from `main` at https://jthorson0.github.io/snack-route/ (repo
+JThorson0/snack-route). `git push origin main` deploys.
+
 ## Testing
 
 Serve with `python3 -m http.server 8787` (see `.claude/launch.json`) and test at
