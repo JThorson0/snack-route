@@ -55,6 +55,16 @@ when the user asks for a full reset. Item `29680` is intentionally on two
 products. User's own shorthand names (Lance Ccc, Pbh, Tc Cheddar, 100 camp 20, …)
 are kept as product names; the pick-sheet text lives in `desc` and is searchable.
 
+## History
+
+Every rollover pushes `{at, orders}` onto `S.history` (capped at 104). The History
+tab aggregates it (top sellers per store, past orders). The store sheet's grey
+column normally shows `orders.previous`; tapping the "last order" stat flips
+`ui.prevDepth` to 2 (the entry before last, from history) — it resets to 1 on
+every load and rollover. Undoing a rollover pops the history entry it filed.
+`CATALOG_PATCH` is for in-place catalog fixes that must not wipe data (unlike
+`CATALOG_VERSION`).
+
 ## Cutoffs
 
 Tue 07:30 America/New_York → Thursday pickup. Sat 07:30 → Tuesday pickup.

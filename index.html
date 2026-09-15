@@ -289,6 +289,35 @@ body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 2px)}
 .note{margin:2px 8px 14px;color:var(--dim2);font-size:12.5px;line-height:1.5;display:flex;gap:8px;font-weight:600}
 .note svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none;margin-top:1px}
 
+/* ---------- history ---------- */
+.stitle .lg.last{text-align:left;color:inherit;border-radius:12px;padding:4px 8px;margin:-4px -8px}
+.stitle .lg.last:active{background:rgba(0,0,0,.12)}
+.stitle .lg.last .l{display:inline-flex;align-items:center;gap:3px}
+.stitle .lg.last .l svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.stitle .lg.last.two .v{opacity:1;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:4px}
+.hstat{display:flex;gap:10px;margin:0 0 14px}
+.hstat .st2{flex:1;background:var(--surface);border-radius:var(--r);padding:14px 16px}
+.hstat .st2 .v{font-size:30px;font-weight:900;letter-spacing:-.04em;line-height:1}
+.hstat .st2 .l{font-size:12px;color:var(--dim);font-weight:700;margin-top:6px}
+.hsec{font-size:13px;font-weight:900;padding:10px 8px 8px;display:flex;justify-content:space-between;align-items:center}
+.hsec span{color:var(--dim);font-weight:700;font-size:12px}
+.hrow{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);position:relative}
+.hrow + .hrow::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+.hrow .rank{width:24px;color:var(--dim2);font-weight:900;font-size:13px;text-align:right;flex:none}
+.hrow .body{flex:1;min-width:0}
+.hrow .name{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hrow .bar{height:6px;border-radius:3px;background:var(--surface3);margin-top:7px;overflow:hidden}
+.hrow .bar i{display:block;height:100%;background:var(--c,#fff);border-radius:3px}
+.hrow .meta{font-size:11.5px;color:var(--dim);font-weight:600;margin-top:5px}
+.hrow .tot{font-size:22px;font-weight:900;letter-spacing:-.03em;min-width:44px;text-align:right}
+.horder{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);width:100%;text-align:left;position:relative}
+.horder + .horder::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+.horder .body{flex:1;min-width:0}
+.horder .d{font-weight:800;font-size:15px}
+.horder .m{font-size:12px;color:var(--dim);font-weight:600;margin-top:3px}
+.horder .tot{font-size:20px;font-weight:900;letter-spacing:-.03em}
+.hlines .li .name{font-weight:700}
+.hlines .li .q{font-size:18px;font-weight:900;min-width:36px;text-align:right}
 /* ---------- setup ---------- */
 .sec{padding:20px 8px 8px;font-size:13px;color:var(--text);letter-spacing:-.01em;font-weight:900;display:flex;justify-content:space-between;align-items:center}
 .sec span{color:var(--dim);font-weight:700;font-size:12px}
@@ -345,6 +374,12 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').ca
     <div class="scroll" id="cutoffs"></div>
   </section>
 
+  <section class="view" id="view-history" hidden>
+    <div class="hdr"><h1>History</h1><div class="sub" id="hist-sub"></div></div>
+    <div class="chips" id="hist-chips" style="padding-top:0"></div>
+    <div class="scroll" id="history"></div>
+  </section>
+
   <section class="view" id="view-setup" hidden>
     <div class="hdr"><h1>Setup</h1><div class="sub" id="setup-sub"></div></div>
     <div class="scroll" id="setup"></div>
@@ -362,6 +397,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').ca
     <button class="tab active" data-tab="stores"><svg viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg>Stores</button>
     <button class="tab" data-tab="master"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Master</button>
     <button class="tab" data-tab="cutoffs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cutoffs</button>
+    <button class="tab" data-tab="history"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>History</button>
     <button class="tab" data-tab="setup"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Setup</button>
   </nav>
 
@@ -391,6 +427,7 @@ const SEED_STORES = [
 // name, item number (string, leading zeros kept), aliases, category, pick-sheet description
 // Source: "Order Pick Sheets (Updated 1/1/25)" — Snyders-Lance pick sheet, Orlando FL.
 const CATALOG_VERSION = 2;
+const CATALOG_PATCH = 1;   // small in-place catalog fixes that must NOT reset the user's data
 const SEED_PRODUCTS = [
   ["Toastchee Family Size", "104198", "toastchee fs, tc fs, family toastchee", "Family Size Crackers", "30.3Z LN TOASTCHEE FS;6C x20;NP"],
   ["Toasty Family Size", "104199", "toasty fs, family toasty", "Family Size Crackers", "25.7Z LN TOASTY FS;6C x20;NP"],
@@ -413,7 +450,7 @@ const SEED_PRODUCTS = [
   ["Toasty HP", "115342", "toasty, toasty hp", "Lance HomePacks", "10.3Z LN TOASTY HP;14C"],
   ["Tc Cheddar", "115353", "tc cheddar, tcc, toastchee cheddar", "Lance HomePacks", "11Z TOASTCHEE CHED 14CT"],
   ["Captain Wafer VP HP", "115362", "captain wafer, cpt wfr, wafer vp, captains", "Lance HomePacks", "11Z LAN CPT WFR VP HP 14C;NP"],
-  ["Gr Ch Waf HP", "115339", "gr chwaf, gr ch waf, chwaf", "Lance HomePacks", "11Z LANCE GR CHWAF-HP;14C;3.39"],
+  ["Grilled Cheese HP", "115339", "grilled cheese, grilled cheese wafer, gr ch waf, gr chwaf", "Lance HomePacks", "11Z LANCE GR CHWAF-HP;14C;3.39"],
   ["White Cheddar HP", "115341", "white cheddar, wht ched, white ched hp", "Lance HomePacks", "11Z LANCE WHITE CHEDDAR 14CT HP"],
   ["Gf original", "114597", "gf original, gf orig, gluten free crackers", "Gluten Free Crackers", "5Z LN GF ORIGINAL CRCKRS 3.99"],
   ["SD Almond Toast", "497120", "almond toast, almond", "Stella D'oro", "6.6Z SD ALMOND TST;12C;3.29"],
@@ -577,12 +614,13 @@ function seed() {
   return {
     version: 1,
     stores: SEED_STORES.map((s, i) => ({ id: 's' + (i + 1), name: s[0], short: s[1], color: PALETTE[i % PALETTE.length] })),
-    catalogVersion: CATALOG_VERSION,
+    catalogVersion: CATALOG_VERSION, catalogPatch: CATALOG_PATCH,
+    history: [],
     products: SEED_PRODUCTS.map((p, i) => ({ id: 'p' + (i + 1), name: p[0], item: p[1], aliases: splitAliases(p[2]), category: p[3], desc: p[4] || '' })),
     orders: { current: {}, previous: {} },
     submitted: {},
     rolloverBackup: null, lastRollover: null,
-    ui: { store: 's1', showAll: false, tab: 'stores', collapsed: {} }
+    ui: { store: 's1', showAll: false, tab: 'stores', collapsed: {}, prevDepth: 1, histStore: 'all' }
   };
 }
 function cleanOrder(x) {
@@ -611,7 +649,15 @@ function migrate(o) {
   o.rolloverBackup = o.rolloverBackup || null;
   o.lastRollover = o.lastRollover || null;
   o.catalogVersion = Number(o.catalogVersion) || 1;
-  o.ui = Object.assign({ store: o.stores[0].id, showAll: false, tab: 'stores', collapsed: {} }, o.ui || {});
+  o.catalogPatch = Number(o.catalogPatch) || 0;
+  if (o.catalogPatch < 1) {
+    const g = o.products.find(p => p.item === '115339' && p.name === 'Gr Ch Waf HP');
+    if (g) { g.name = 'Grilled Cheese HP'; g.aliases = [...new Set(['grilled cheese', 'grilled cheese wafer'].concat(g.aliases))]; }
+    o.catalogPatch = 1;
+  }
+  o.history = Array.isArray(o.history) ? o.history.filter(h => h && typeof h === 'object').map(h => ({ at: Number(h.at) || 0, orders: cleanOrder(h.orders) })).slice(-104) : [];
+  o.ui = Object.assign({ store: o.stores[0].id, showAll: false, tab: 'stores', collapsed: {}, prevDepth: 1, histStore: 'all' }, o.ui || {});
+  o.ui.prevDepth = 1;   // always come back to "last order"; the 2-back view is a peek, not a mode
   if (!o.ui.collapsed || typeof o.ui.collapsed !== 'object') o.ui.collapsed = {};
   if (!o.stores.some(s => s.id === o.ui.store)) o.ui.store = o.stores[0].id;
   return o;
@@ -625,6 +671,12 @@ function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch
 const productMap = () => new Map(S.products.map(p => [p.id, p]));
 const storeById = id => S.stores.find(s => s.id === id);
 const getQ = (kind, sid, pid) => (S.orders[kind][sid] || {})[pid] || 0;
+// The "last" column: depth 1 = the order just placed; depth 2 = the one before it (from history).
+function prevMap(sid) {
+  if (S.ui.prevDepth === 2) { const h = S.history[S.history.length - 2]; return (h && h.orders[sid]) || {}; }
+  return S.orders.previous[sid] || {};
+}
+const prevLabel = () => S.ui.prevDepth === 2 ? '2 ago' : 'last';
 function setQ(sid, pid, q) {
   const cur = S.orders.current; cur[sid] = cur[sid] || {};
   const from = cur[sid][pid] || 0;
@@ -697,7 +749,7 @@ for (const ev of ['pointerdown', 'mousedown']) document.addEventListener(ev, e =
 });
 
 // ===================== tabs =====================
-const views = { stores: $('#view-stores'), master: $('#view-master'), cutoffs: $('#view-cutoffs'), setup: $('#view-setup') };
+const views = { stores: $('#view-stores'), master: $('#view-master'), cutoffs: $('#view-cutoffs'), history: $('#view-history'), setup: $('#view-setup') };
 const qaForm = $('#qa'), qaIn = $('#qa-in'), sugg = $('#sugg');
 function showView(name) {
   if (!views[name]) name = 'stores';
@@ -709,6 +761,7 @@ function showView(name) {
   if (name === 'stores') { layoutTrack(false); renderPaneIfDirty(S.ui.store); }
   if (name === 'master') renderMaster();
   if (name === 'cutoffs') renderCutoffs();
+  if (name === 'history') renderHistory();
   if (name === 'setup') renderSetup();
   startTick(name === 'cutoffs');
 }
@@ -736,10 +789,11 @@ function updateModeButtons() {
 }
 function updateSummary(sid) {
   const pane = paneEl(sid); if (!pane) return;
-  const cur = S.orders.current[sid] || {}, prev = S.orders.previous[sid] || {};
+  const cur = S.orders.current[sid] || {}, prev = prevMap(sid);
   const c = Object.values(cur).reduce((a, b) => a + b, 0), n = Object.keys(cur).length;
   const pc = Object.values(prev).reduce((a, b) => a + b, 0);
-  pane.querySelector('.stitle .sum').innerHTML = `<span class="lg now"><span class="v">${c}</span><span class="l">cases this order${n ? ` · ${n} line${n === 1 ? '' : 's'}` : ''}</span></span><span class="lg last"><span class="v">${pc}</span><span class="l">last order</span></span>`;
+  const two = S.ui.prevDepth === 2;
+  pane.querySelector('.stitle .sum').innerHTML = `<span class="lg now"><span class="v">${c}</span><span class="l">cases this order${n ? ` · ${n} line${n === 1 ? '' : 's'}` : ''}</span></span><button type="button" class="lg last${two ? ' two' : ''}" aria-label="Switch between last order and the one before"><span class="v">${pc}</span><span class="l">${two ? '2 orders ago' : 'last order'} <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></span></button>`;
 }
 function renderChips() {
   chips.innerHTML = S.stores.map((s, i) => { const n = lineCount(s.id); return `<button type="button" class="chip${i === idx ? ' active' : ''}" data-i="${i}" style="--cc:${s.color}">${esc(s.short)}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
@@ -750,7 +804,7 @@ chips.addEventListener('click', e => { const c = e.target.closest('.chip'); if (
 
 function rowHTML(p, prev, cur) {
   return `<div class="rw" data-pid="${p.id}"><div class="under">Clear</div><div class="row${cur > 0 ? ' on' : ''}">
-<div class="prev">${prev > 0 ? `<span><b>${prev}</b><i>last</i></span>` : ''}</div>
+<div class="prev">${prev > 0 ? `<span><b>${prev}</b><i>${prevLabel()}</i></span>` : ''}</div>
 <div class="body"><div class="name">${esc(p.name)}</div><div class="item">${p.item ? esc(p.item) : '<span class="noitem">no item #</span>'}</div></div>
 <div class="qc"><button type="button" class="st" data-d="-1" aria-label="one less"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><div class="cur">${cur}</div><button type="button" class="st" data-d="1" aria-label="one more"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
 </div></div>`;
@@ -758,7 +812,7 @@ function rowHTML(p, prev, cur) {
 function renderPane(sid) {
   const pane = paneEl(sid); if (!pane) return;
   const list = pane.querySelector('.list');
-  const cur = S.orders.current[sid] || {}, prev = S.orders.previous[sid] || {};
+  const cur = S.orders.current[sid] || {}, prev = prevMap(sid);
   let html = '';
   if (S.ui.showAll) {
     const groups = new Map();
@@ -788,7 +842,7 @@ function renderPaneIfDirty(sid) { if (dirty.has(sid)) renderPane(sid); }
 function markAllDirty() { S.stores.forEach(s => dirty.add(s.id)); }
 function patchRow(sid, pid, reveal) {
   const pane = paneEl(sid); if (!pane) return;
-  const cur = getQ('current', sid, pid), prev = getQ('previous', sid, pid);
+  const cur = getQ('current', sid, pid), prev = prevMap(sid)[pid] || 0;
   let rw = pane.querySelector(`.rw[data-pid="${pid}"]`);
   const visible = S.ui.showAll || cur > 0 || prev > 0;
   if (!rw || !visible) {
@@ -840,6 +894,12 @@ track.addEventListener('click', e => {
     cat.classList.toggle('closed', closed); cat.setAttribute('aria-expanded', String(!closed));
     cat.nextElementSibling.hidden = closed;
     S.stores.forEach(st => { if (st.id !== S.ui.store) dirty.add(st.id); });   // other panes pick it up when shown
+    return;
+  }
+  if (e.target.closest('.lg.last')) {
+    if (S.ui.prevDepth === 1 && S.history.length < 2) { toast('No older order yet — the one-before-last shows up here after two rollovers'); return; }
+    S.ui.prevDepth = S.ui.prevDepth === 1 ? 2 : 1; save(); vib(); markAllDirty(); renderPane(S.ui.store);
+    toast(S.ui.prevDepth === 2 ? 'Showing the order before last in the grey tiles' : 'Back to last order');
     return;
   }
   if (e.target.closest('.clear')) {
@@ -935,7 +995,7 @@ function renderSugg() {
     sugg.innerHTML = `<span class="hint">No match.</span><button type="button" class="sg create" data-name="${esc(raw.trim())}">＋ Create “${esc(raw.trim())}”</button>`;
     return;
   }
-  sugg.innerHTML = c.map((x, i) => { const last = getQ('previous', S.ui.store, x.product.id); return `<button type="button" class="sg${i ? '' : ' first'}" data-pid="${x.product.id}" data-qty="${x.qty}">${esc(x.product.name)} <span class="q">×${x.qty}</span>${last ? `<span class="last">last ${last}</span>` : ''}</button>`; }).join('');
+  sugg.innerHTML = c.map((x, i) => { const last = prevMap(S.ui.store)[x.product.id] || 0; return `<button type="button" class="sg${i ? '' : ' first'}" data-pid="${x.product.id}" data-qty="${x.qty}">${esc(x.product.name)} <span class="q">×${x.qty}</span>${last ? `<span class="last">${prevLabel()} ${last}</span>` : ''}</button>`; }).join('');
 }
 function addProductQty(product, qty) {
   const sid = S.ui.store;
@@ -1242,7 +1302,10 @@ $('#cutoffs').addEventListener('click', e => {
   }
 });
 function doRollover() {
-  S.rolloverBackup = { previous: clone(S.orders.previous), current: clone(S.orders.current), at: Date.now() };
+  S.rolloverBackup = { previous: clone(S.orders.previous), current: clone(S.orders.current), at: Date.now(), filed: true };
+  S.history.push({ at: Date.now(), orders: clone(S.orders.current) });   // history keeps every order ever rolled over
+  if (S.history.length > 104) S.history = S.history.slice(-104);
+  S.ui.prevDepth = 1;
   S.orders.previous = clone(S.orders.current);
   S.orders.current = {};
   S.lastRollover = Date.now();
@@ -1252,10 +1315,77 @@ function doRollover() {
 function undoRollover() {
   const b = S.rolloverBackup; if (!b) return;
   S.orders.previous = clone(b.previous); S.orders.current = clone(b.current);
-  S.rolloverBackup = null; S.lastRollover = null;
+  if (b.filed && S.history.length) S.history.pop();
+  S.rolloverBackup = null; S.lastRollover = S.history.length ? S.history[S.history.length - 1].at : null;
   save(); vib(); markAllDirty(); renderChips(); renderCutoffs();
   toast('Rollover undone');
 }
+
+// ===================== history =====================
+const fmtHist = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' });
+function historyEntries() {
+  if (S.history.length) return S.history;
+  // legacy: a previous order that was rolled over before history existed
+  if (Object.keys(S.orders.previous).length) return [{ at: S.lastRollover || 0, orders: S.orders.previous }];
+  return [];
+}
+function renderHistory() {
+  const entries = historyEntries();
+  const sel = S.ui.histStore || 'all';
+  const stFilter = sel === 'all' ? null : sel;
+  $('#hist-chips').innerHTML = [`<button type="button" class="chip${!stFilter ? ' active' : ''}" data-h="all" style="--cc:#fff">All stores</button>`]
+    .concat(S.stores.map(s => `<button type="button" class="chip${stFilter === s.id ? ' active' : ''}" data-h="${s.id}" style="--cc:${s.color}">${esc(s.short)}</button>`)).join('');
+  const byId = productMap();
+  const totals = new Map(); let cases = 0; const perOrder = [];
+  for (const h of entries) {
+    let oc = 0, ol = 0;
+    for (const sid in h.orders) {
+      if (stFilter && sid !== stFilter) continue;
+      for (const pid in h.orders[sid]) {
+        const q = h.orders[sid][pid]; if (!q) continue;
+        let t = totals.get(pid); if (!t) { t = { cases: 0, orders: new Set() }; totals.set(pid, t); }
+        t.cases += q; t.orders.add(h.at); cases += q; oc += q; ol++;
+      }
+    }
+    perOrder.push({ at: h.at, cases: oc, lines: ol, h });
+  }
+  const n = entries.length;
+  $('#hist-sub').textContent = n ? `${n} order${n === 1 ? '' : 's'} filed` : 'nothing filed yet';
+  const st = stFilter ? storeById(stFilter) : null;
+  const color = st ? st.color : '#fff';
+  const ranked = [...totals.entries()].map(([pid, t]) => ({ p: byId.get(pid), pid, cases: t.cases, orders: t.orders.size })).filter(r => r.p).sort((a, b) => b.cases - a.cases || a.p.name.localeCompare(b.p.name));
+  const max = ranked.length ? ranked[0].cases : 1;
+  const show = histAll ? ranked : ranked.slice(0, 15);
+  let html = '';
+  if (!n) html = `<div class="empty"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></div><br>Nothing here yet.<br>Every time you <b>roll over</b> on the Cutoffs tab, that order gets filed here — then you'll see what each store sells most.</div>`;
+  else {
+    html += `<div class="hstat"><div class="st2"><div class="v">${cases}</div><div class="l">cases${st ? ' at ' + esc(st.short) : ''}</div></div><div class="st2"><div class="v">${n ? Math.round(cases / n) : 0}</div><div class="l">avg per order</div></div><div class="st2"><div class="v">${ranked.length}</div><div class="l">products</div></div></div>`;
+    html += `<div class="hsec">Top sellers <span>cases · orders it was on</span></div><div class="setup-group">`;
+    html += show.map((r, i) => `<div class="hrow"><div class="rank">${i + 1}</div><div class="body"><div class="name">${esc(r.p.name)}</div><div class="bar"><i style="--c:${color};width:${Math.max(4, Math.round(r.cases / max * 100))}%"></i></div><div class="meta">${r.p.item ? esc(r.p.item) + ' · ' : ''}on ${r.orders} of ${n} order${n === 1 ? '' : 's'}</div></div><div class="tot">${r.cases}</div></div>`).join('') || '<div class="empty">No cases for this store yet.</div>';
+    html += `</div>`;
+    if (ranked.length > 15) html += `<div class="stack"><button type="button" class="btn" id="hist-more">${histAll ? 'Show top 15' : `Show all ${ranked.length}`}</button></div>`;
+    html += `<div class="hsec">Past orders <span>newest first · tap for lines</span></div><div class="setup-group">`;
+    html += perOrder.slice().reverse().map(o => `<button type="button" class="horder" data-at="${o.at}"><div class="body"><div class="d">${o.at ? fmtHist.format(new Date(o.at)) : 'Earlier'}</div><div class="m">${o.lines} line${o.lines === 1 ? '' : 's'}${st ? '' : ' · ' + Object.keys(o.h.orders).filter(sid => Object.keys(o.h.orders[sid]).length).length + ' stores'}</div></div><div class="tot">${o.cases}</div></button>`).join('');
+    html += `</div>`;
+  }
+  $('#history').innerHTML = html;
+}
+let histAll = false;
+$('#hist-chips').addEventListener('click', e => { const c = e.target.closest('[data-h]'); if (!c) return; S.ui.histStore = c.dataset.h; save(); histAll = false; renderHistory(); });
+$('#history').addEventListener('click', e => {
+  if (e.target.closest('#hist-more')) { histAll = !histAll; renderHistory(); return; }
+  const o = e.target.closest('.horder'); if (!o) return;
+  const h = historyEntries().find(x => String(x.at) === o.dataset.at); if (!h) return;
+  const stFilter = S.ui.histStore === 'all' ? null : S.ui.histStore; const byId = productMap();
+  let body = '';
+  for (const s of S.stores) {
+    if (stFilter && s.id !== stFilter) continue;
+    const lines = Object.entries(h.orders[s.id] || {}).filter(([, q]) => q > 0);
+    if (!lines.length) continue;
+    body += `<div class="hsec" style="padding-left:0"><span style="color:${s.color};font-weight:900;font-size:13px">${esc(s.short)}</span><span>${lines.reduce((a, [, q]) => a + q, 0)} cases</span></div><div class="setup-group hlines">${lines.map(([pid, q]) => { const p = byId.get(pid); return `<div class="li"><div class="body"><div class="name">${esc(p ? p.name : pid)}</div><div class="meta">${p && p.item ? esc(p.item) : ''}</div></div><div class="q">${q}</div></div>`; }).join('')}</div>`;
+  }
+  openSheet({ title: h.at ? fmtHist.format(new Date(h.at)) : 'Earlier order', sub: 'Order as it was rolled over', html: body || '<div class="empty">No lines.</div>' });
+});
 
 // ===================== setup =====================
 function renderSetup() {
@@ -1272,9 +1402,10 @@ function renderSetup() {
 <div class="search"><input type="search" id="setup-q" placeholder="Filter products…" value="${esc(setupFilter)}" autocomplete="off"></div>
 <div id="plist" class="setup-group">${plistHTML(shown)}</div>
 <div class="sec">Backup</div>
-<div class="stack"><button type="button" class="btn" id="btn-export"><svg viewBox="0 0 24 24"><path d="M12 3v12M6 9l6 6 6-6M4 21h16"/></svg>Download backup</button><button type="button" class="btn" id="btn-copyjson">Copy JSON</button></div>
+<div class="stack"><button type="button" class="btn primary" id="btn-share"><svg viewBox="0 0 24 24"><path d="M12 3v13M7 8l5-5 5 5M5 14v6h14v-6"/></svg>Share backup</button><button type="button" class="btn" id="btn-export"><svg viewBox="0 0 24 24"><path d="M12 3v12M6 9l6 6 6-6M4 21h16"/></svg>Download</button><button type="button" class="btn" id="btn-copyjson">Copy JSON</button></div>
+<div class="note">Everything saves to this phone instantly on every tap. Share a backup to Drive or email now and then so a lost phone doesn't mean a lost catalog. The backup includes order history.</div>
 <div class="stack"><label class="btn filebtn">Import backup file<input type="file" accept="application/json,.json" id="file-import"></label><button type="button" class="btn" id="btn-pastejson">Paste backup</button></div>
-<div class="note">Everything lives on this phone only. There's no sync — move data between phones with a backup file.</div>
+<div class="note">There's no sync between phones — move data with a backup file (Import above).</div>
 <div class="sec">Danger zone</div>
 <div class="stack"><button type="button" class="btn ghost" id="btn-reset">Reset to the starter catalog…</button></div>`;
 }
@@ -1307,6 +1438,7 @@ setupEl.addEventListener('click', e => {
   if (e.target.closest('#btn-addprod')) { openProductEditor(null); return; }
   if (e.target.closest('#btn-bulk')) { openBulk(); return; }
   if (e.target.closest('#btn-export')) { exportBackup(); return; }
+  if (e.target.closest('#btn-share')) { shareBackup(); return; }
   if (e.target.closest('#btn-copyjson')) { copyText(backupJSON()).then(ok => toast(ok ? 'Backup JSON copied' : 'Copy failed')); return; }
   if (e.target.closest('#btn-pastejson')) { openPasteImport(); return; }
   if (e.target.closest('#btn-reset')) {
@@ -1390,6 +1522,14 @@ function exportBackup() {
     toast('Backup downloaded');
   } catch (e) { toast('Download failed — use Copy JSON instead'); }
 }
+async function shareBackup() {
+  const name = `snack-route-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  try {
+    const file = new File([backupJSON()], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Snack Route backup' }); vib(); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  exportBackup();
+}
 function importJSON(text) {
   let obj; try { obj = JSON.parse(text); } catch (e) { toast('That is not valid JSON'); return; }
   const data = obj && obj.data && obj.data.stores ? obj.data : obj;
@@ -1412,6 +1552,7 @@ function renderAll() {
   if (!views.setup.hidden) renderSetup();
 }
 load();
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 // ?demo — load a realistic "last order was submitted and rolled over" state so the two-column view can be seen.
 // One-shot: the param is removed from the URL. Setup → Reset clears it again.
 if (new URLSearchParams(location.search).has('demo')) {
