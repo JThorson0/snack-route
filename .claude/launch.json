@@ -5,7 +5,8 @@
       "name": "snack-route",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8787", "--bind", "127.0.0.1"],
-      "port": 8787
+      "port": 8787,
+      "cwd": "/Users/justinthorson/Sites/snack-route"
     }
   ]
 }

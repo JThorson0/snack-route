@@ -1,0 +1,1057 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#0b0c0f">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Snack Route</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#0b0c0f;--surface:#15171c;--surface2:#1e2129;--surface3:#282c36;--line:#22252d;
+  --text:#e9ebf1;--dim:#8b92a1;--dim2:#555c6a;--accent:#f4b942;--accent-ink:#1a1200;--danger:#e5484d;
+  --tabs-h:56px;--qa-h:100px;--sab:env(safe-area-inset-bottom,0px);--sat:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font:15px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overscroll-behavior:none}
+body{overflow:hidden;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;touch-action:manipulation}
+input,textarea{font:inherit;color:inherit}
+kbd{font:inherit;background:var(--surface2);padding:1px 6px;border-radius:5px;color:var(--text)}
+b{font-weight:700}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+.view{flex:1;min-height:0;display:flex;flex-direction:column}
+.view[hidden]{display:none}
+.hdr{flex:none;padding:calc(var(--sat) + 12px) 16px 8px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.hdr h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.01em}
+.hdr .sub{color:var(--dim);font-size:13px;white-space:nowrap}
+
+/* store chips */
+.chips{flex:none;display:flex;gap:6px;padding:calc(var(--sat) + 10px) 12px 8px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:36px;padding:0 12px;border-radius:18px;background:var(--surface);color:var(--dim);
+  font-weight:600;font-size:14px;display:flex;align-items:center;gap:7px;border:1px solid transparent}
+.chip.active{color:var(--text);border-color:var(--accent);background:var(--surface2)}
+.chip .n{font-size:12px;color:var(--accent);font-weight:700}
+
+/* store sheets */
+.track-wrap{flex:1;min-height:0;overflow:hidden;position:relative}
+.track{display:flex;height:100%;width:100%;touch-action:pan-y;will-change:transform}
+.pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;position:relative}
+.colhead{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;height:34px;padding:0 12px 0 16px;
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--dim2);border-bottom:1px solid var(--line)}
+.colhead .c-last{width:44px}
+.colhead .c-prod{flex:1}
+.colhead .c-prod button{height:34px;color:var(--dim);letter-spacing:inherit;text-transform:inherit;font-weight:inherit;display:inline-flex;align-items:center;gap:4px}
+.colhead .c-prod button svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2}
+.colhead .c-now{width:140px;text-align:center;color:var(--accent)}
+.cat{position:sticky;top:34px;z-index:1;background:var(--bg);padding:14px 16px 6px;font-size:12px;font-weight:600;color:var(--dim);letter-spacing:.02em}
+.rw{position:relative;overflow:hidden}
+.rw .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;
+  background:var(--danger);color:#fff;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;opacity:0}
+.rw.swiping .under{opacity:1}
+.row{position:relative;display:flex;align-items:center;height:56px;padding:0 12px 0 16px;background:var(--bg);
+  border-bottom:1px solid var(--line);user-select:none;-webkit-user-select:none}
+.row .prev{width:44px;color:var(--dim);font-size:15px;font-weight:500}
+.row .prev .z{color:var(--dim2)}
+.row .body{flex:1;min-width:0;padding-right:8px}
+.row .name{font-weight:500;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.on .name{color:var(--text)}
+.row .item{font-size:11.5px;color:var(--dim2);margin-top:2px;letter-spacing:.03em}
+.row .item .noitem{font-style:italic}
+.qc{display:flex;align-items:center;width:140px;flex:none;justify-content:space-between}
+.st{width:44px;height:44px;border-radius:12px;background:var(--surface);color:var(--dim);font-size:24px;font-weight:400;
+  display:flex;align-items:center;justify-content:center;line-height:1}
+.st:active{background:var(--surface3);color:var(--text)}
+.cur{width:44px;text-align:center;font-size:19px;font-weight:700;color:var(--dim2)}
+.row.on .cur{color:var(--accent)}
+.cur.bump{animation:bump 170ms ease-out}
+@keyframes bump{0%{transform:scale(1.3)}100%{transform:scale(1)}}
+.rw.flash .row{animation:flash 600ms ease-out}
+@keyframes flash{0%{background:var(--surface2)}100%{background:var(--bg)}}
+.empty{padding:36px 24px;color:var(--dim);text-align:center;line-height:1.55;font-size:14px}
+.empty b{color:var(--text)}
+.empty .link{display:inline-block;margin-top:14px;color:var(--accent);font-weight:600;height:44px;line-height:44px;padding:0 12px}
+
+/* quick add */
+.qa{flex:none;background:var(--surface);border-top:1px solid var(--line);padding:4px 12px 8px;height:var(--qa-h)}
+.sugg{height:36px;display:flex;gap:6px;overflow-x:auto;align-items:center;scrollbar-width:none}
+.sugg::-webkit-scrollbar{display:none}
+.sugg .hint{color:var(--dim2);font-size:12.5px;white-space:nowrap}
+.sugg .hint kbd{background:var(--surface2);color:var(--dim)}
+.sugg .ok{color:var(--dim);font-size:13.5px;white-space:nowrap}
+.sugg .ok b{color:var(--accent)}
+.sg{flex:none;height:30px;padding:0 10px;border-radius:8px;background:var(--surface2);color:var(--text);font-size:13.5px;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;font-weight:500}
+.sg.first{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.sg .q{opacity:.65}
+.sg.undo{color:var(--accent);font-weight:700;margin-left:auto}
+.qa-row{display:flex;gap:8px;margin-top:4px}
+.qa-row input{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;font-size:16px;outline:none}
+.qa-row input:focus{border-color:var(--accent)}
+.qa-row input::placeholder{color:var(--dim2)}
+.qa-row button{width:68px;height:48px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:15px}
+.qa-row button:active{filter:brightness(1.1)}
+
+/* tabs */
+.tabs{flex:none;display:flex;height:calc(var(--tabs-h) + var(--sab));padding-bottom:var(--sab);background:var(--surface);border-top:1px solid var(--line)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--dim);font-size:11px;font-weight:600}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.active{color:var(--accent)}
+
+/* toast */
+.toast{position:absolute;left:12px;right:12px;bottom:calc(var(--tabs-h) + var(--sab) + 10px);z-index:50;background:var(--surface3);
+  color:var(--text);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.toast[hidden]{display:none}
+body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 10px)}
+.toast .msg{flex:1;min-width:0}
+.toast button{color:var(--accent);font-weight:700;height:44px;padding:0 10px;margin:-10px -10px -10px 0}
+.toast button[hidden]{display:none}
+
+/* overlays */
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;flex-direction:column;justify-content:flex-end}
+.sheet{background:var(--surface);border-radius:18px 18px 0 0;max-height:92%;display:flex;flex-direction:column;padding-bottom:var(--sab);will-change:transform}
+.sheet.full{height:100%;max-height:100%;border-radius:0;background:var(--bg);padding-top:var(--sat)}
+.sheet-head{padding:8px 16px 6px;touch-action:none;flex:none;user-select:none;-webkit-user-select:none}
+.handle{width:40px;height:4px;border-radius:2px;background:var(--dim2);margin:0 auto 12px}
+.sheet-title{font-weight:700;font-size:17px}
+.sheet-sub{color:var(--dim);font-size:13px;margin-top:2px}
+.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 16px 16px;flex:1;min-height:0}
+.sheet.enter{animation:up 220ms cubic-bezier(.2,.7,.2,1)}
+@keyframes up{from{transform:translateY(100%)}}
+
+/* buttons & forms */
+.btn{height:48px;padding:0 18px;border-radius:12px;background:var(--surface2);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.ghost{background:transparent;color:var(--dim)}
+.btn.block{width:100%}
+.btn:active{filter:brightness(1.15)}
+.btn[disabled]{opacity:.4}
+.btnrow{display:flex;gap:8px;margin-top:12px}
+.btnrow .btn{flex:1}
+.fld{display:block;margin-bottom:12px}
+.fld > span{display:block;font-size:12px;color:var(--dim);margin-bottom:5px;font-weight:600}
+.fld input,.fld textarea{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 12px;font-size:16px;outline:none}
+.fld textarea{height:auto;min-height:110px;padding:10px 12px;resize:vertical;line-height:1.4}
+.fld input:focus,.fld textarea:focus{border-color:var(--accent)}
+.fld .help{font-size:12px;color:var(--dim2);margin-top:5px;line-height:1.4}
+.fld .help code{color:var(--dim)}
+
+/* master */
+.mlist{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;position:relative;-webkit-overflow-scrolling:touch}
+.ptr{height:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;color:var(--dim);font-size:12px;padding-bottom:8px;will-change:height}
+.ptr.spin{transition:height 180ms ease}
+.mrow{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);gap:12px;min-height:56px}
+.mrow .body{flex:1;min-width:0}
+.mrow .name{font-weight:500}
+.mrow .item{font-size:11.5px;color:var(--dim2);letter-spacing:.03em;margin-top:2px}
+.mrow .by{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.4}
+.mrow .by b{color:var(--dim);font-weight:600}
+.mrow .tot{font-size:24px;font-weight:700;color:var(--accent);min-width:48px;text-align:right}
+.actions{flex:none;display:flex;gap:8px;padding:8px 12px;background:var(--surface);border-top:1px solid var(--line)}
+.actions .btn{flex:1}
+
+/* step-through */
+.step{display:flex;flex-direction:column;height:100%;padding:0 16px;gap:12px}
+.step .pos{color:var(--dim);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.step .pname{font-size:22px;font-weight:700;line-height:1.2;min-height:54px}
+.step .pcat{color:var(--dim);font-size:13px;margin-top:2px}
+.big{flex:1;min-height:0;border-radius:18px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:12px}
+.big .lbl{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.big .val{font-size:44px;font-weight:700;letter-spacing:.01em;line-height:1.1}
+.big .val.missing{font-size:18px;color:var(--dim);font-weight:500;font-style:italic}
+.big.cases .val{color:var(--accent);font-size:64px}
+.big .tip{font-size:12px;color:var(--dim2)}
+.big:active{background:var(--surface2)}
+.big.copied{background:var(--surface2);outline:2px solid var(--accent)}
+.big.copied .tip{color:var(--accent);font-weight:600}
+.step .nav{display:flex;gap:8px;padding-bottom:8px}
+.step .nav .btn{flex:1;height:56px;font-size:16px}
+.step .nav .btn.primary{flex:2}
+
+/* cutoffs */
+.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:24px}
+.card{background:var(--surface);border-radius:14px;padding:14px 16px;margin:0 16px 12px}
+.card .k{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.card .big2{font-size:30px;font-weight:700;margin:4px 0 2px;letter-spacing:-.01em}
+.card.next .big2{color:var(--accent)}
+.card .when{color:var(--dim);font-size:14px}
+.card .when b{color:var(--text);font-weight:600}
+.card .row2{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
+.card p{margin:8px 0 0;color:var(--dim);font-size:13.5px;line-height:1.45}
+.card p b{color:var(--text)}
+.check{height:44px;padding:0 14px;border-radius:12px;background:var(--surface2);display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--dim)}
+.check svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.check.on{background:var(--accent);color:var(--accent-ink)}
+.note{margin:0 16px 12px;color:var(--dim2);font-size:12.5px;line-height:1.45}
+
+/* setup */
+.sec{padding:16px 16px 6px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.sec .btn{height:32px;padding:0 12px;font-size:12px;text-transform:none;letter-spacing:0}
+.li{display:flex;align-items:center;min-height:56px;padding:6px 16px;border-bottom:1px solid var(--line);gap:10px;width:100%;text-align:left}
+.li .body{flex:1;min-width:0}
+.li .name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .meta{font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .chev{color:var(--dim2)}
+.li input{height:40px;border-radius:9px;border:1px solid var(--line);background:var(--bg);padding:0 10px;font-size:15px;outline:none;min-width:0}
+.li input:focus{border-color:var(--accent)}
+.li input.short{width:76px;flex:none;text-align:center}
+.li input.long{flex:1}
+.stack{display:flex;gap:8px;flex-wrap:wrap;padding:6px 16px 8px}
+.stack .btn{flex:1 1 auto}
+.pad{padding:6px 16px 8px}
+.search{padding:6px 16px 8px}
+.search input{width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;font-size:16px;outline:none}
+.search input:focus{border-color:var(--accent)}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;font-size:0}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<script>
+// Register the service worker first thing; nothing waits on this and this waits on nothing.
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(function(){}); }
+</script>
+<div id="app">
+
+  <section class="view" id="view-stores">
+    <div class="chips" id="chips"></div>
+    <div class="track-wrap"><div class="track" id="track"></div></div>
+  </section>
+
+  <section class="view" id="view-master" hidden>
+    <div class="hdr"><h1>Master</h1><div class="sub" id="master-sub"></div></div>
+    <div class="mlist" id="mlist"><div class="ptr" id="ptr">Refreshing totals…</div><div id="mrows"></div></div>
+    <div class="actions">
+      <button class="btn" id="btn-copyall">Copy all</button>
+      <button class="btn primary" id="btn-step">Step through for OTS</button>
+    </div>
+  </section>
+
+  <section class="view" id="view-cutoffs" hidden>
+    <div class="hdr"><h1>Cutoffs</h1><div class="sub">Eastern time</div></div>
+    <div class="scroll" id="cutoffs"></div>
+  </section>
+
+  <section class="view" id="view-setup" hidden>
+    <div class="hdr"><h1>Setup</h1><div class="sub" id="setup-sub"></div></div>
+    <div class="scroll" id="setup"></div>
+  </section>
+
+  <form class="qa" id="qa" autocomplete="off">
+    <div class="sugg" id="sugg"></div>
+    <div class="qa-row">
+      <input id="qa-in" type="text" inputmode="text" enterkeyhint="go" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Add to store…">
+      <button type="submit" id="qa-go">Add</button>
+    </div>
+  </form>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="stores"><svg viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg>Stores</button>
+    <button class="tab" data-tab="master"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Master</button>
+    <button class="tab" data-tab="cutoffs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cutoffs</button>
+    <button class="tab" data-tab="setup"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Setup</button>
+  </nav>
+
+  <div class="toast" id="toast" hidden><div class="msg" id="toast-msg"></div><button id="toast-btn" hidden></button></div>
+  <div id="overlay-root"></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const vib = () => { try { navigator.vibrate && navigator.vibrate(10); } catch (e) {} };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const norm = s => String(s == null ? '' : s).toLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim();
+const clone = o => JSON.parse(JSON.stringify(o));
+
+// ===================== data =====================
+const LS_KEY = 'snackroute.v1';
+const SEED_STORES = [
+  ['Publix 27 (Minneola)', 'P27'], ['Publix 1158', 'P1158'], ['Publix 1751', 'P1751'], ['Publix 1759', 'P1759'],
+  ['Publix 881', 'P881'], ['Target Winter Garden', 'T·WG'], ['Target Clermont', 'T·CL']
+];
+// name, item number (string, leading zeros kept), aliases, category
+const SEED_PRODUCTS = [
+  ['Lance Ccc', '115344', 'ccc, lance ccc', 'Lance'],
+  ['VP', '107866', 'vp, variety pack', 'Lance'],
+  ['Nekot', '115345', 'nekot', 'Lance'],
+  ['Tc Cheddar', '115353', 'tc cheddar, tcc', 'Lance'],
+  ['Pbh', '', 'pbh', 'Lance'],
+  ['WG pb', '115356', 'wg pb', 'Lance'],
+  ['Gf original', '114597', 'gf original, gf orig', 'Gf'],
+  ['Gf mini', '089370', 'gf mini', 'Gf'],
+  ['Gf rods', '', 'gf rods', 'Gf'],
+  ['Stella Marg combo', '497500', 'stella, marg combo', 'Stella'],
+  ['Soh Honey braided', '010160', 'soh honey, braided', 'Snyder\'s'],
+  ['SD hard', '080030', 'sd hard, soh sd hard', 'Snyder\'s'],
+  ['Butter rounds', '113282', 'butter rounds', 'Snyder\'s'],
+  ['Butter snaps', '103405', 'butter snaps', 'Snyder\'s'],
+  ['Itty bitty', '108481', 'itty bitty, itty', 'Snyder\'s'],
+  ['Hard box 1/2', '22752', 'hard box', 'Snyder\'s'],
+  ['100\'a mini', '115007', '100a mini, 100 mini', 'Snyder\'s'],
+  ['Sticks', '080090', 'sticks', 'Snyder\'s'],
+  ['Mini', '080060', 'mini', 'Snyder\'s'],
+  ['Nibblers', '080040', 'nibblers, nibs', 'Snyder\'s'],
+  ['Rods', '', 'rods', 'Snyder\'s'],
+  ['Dip stick', '', 'dip stick', 'Snyder\'s'],
+  ['100 camp 20', '', '100 camp, camp 20', 'Snyder\'s'],
+  ['HMO PCs', '', 'hmo pcs, hmo', 'Pretzel Crisps'],
+  ['PB PCs', '', 'pb pcs', 'Pretzel Crisps'],
+  ['HBW', '', 'hbw', 'Pretzel Crisps'],
+  ['Cape Cod Original 8.5 oz', '107361', 'cc original, cape cod original', 'Cape Cod'],
+];
+const splitAliases = s => Array.isArray(s) ? s.map(norm).filter(Boolean) : String(s || '').split(',').map(norm).filter(Boolean);
+function shortName(name) {
+  const m = String(name).match(/^(\w)\w*\s+(\d+)/);
+  if (m) return (m[1] + m[2]).toUpperCase();
+  return String(name).split(/\s+/).map(w => w[0] || '').join('').toUpperCase().slice(0, 4);
+}
+function seed() {
+  return {
+    version: 1,
+    stores: SEED_STORES.map((s, i) => ({ id: 's' + (i + 1), name: s[0], short: s[1] })),
+    products: SEED_PRODUCTS.map((p, i) => ({ id: 'p' + (i + 1), name: p[0], item: p[1], aliases: splitAliases(p[2]), category: p[3] })),
+    orders: { current: {}, previous: {} },
+    submitted: {},
+    rolloverBackup: null, lastRollover: null,
+    ui: { store: 's1', showAll: false, tab: 'stores' }
+  };
+}
+function cleanOrder(x) {
+  const out = {};
+  if (x && typeof x === 'object') for (const sid in x) {
+    const st = x[sid]; if (!st || typeof st !== 'object') continue;
+    out[sid] = {};
+    for (const pid in st) { const q = Math.max(0, Math.floor(Number(st[pid]) || 0)); if (q > 0) out[sid][pid] = q; }
+  }
+  return out;
+}
+function migrate(o) {
+  const d = seed();
+  o = o && typeof o === 'object' ? o : {};
+  o.version = 1;
+  o.stores = Array.isArray(o.stores) && o.stores.length
+    ? o.stores.map((s, i) => ({ id: String(s.id || ('s' + (i + 1))), name: String(s.name || ''), short: String(s.short || shortName(s.name || '')) }))
+    : d.stores;
+  o.products = Array.isArray(o.products)
+    ? o.products.map(p => ({ id: String(p.id || uid()), name: String(p.name || ''), item: String(p.item == null ? '' : p.item).trim(), aliases: splitAliases(p.aliases), category: String(p.category || 'Uncategorized') }))
+    : d.products;
+  o.orders = o.orders && typeof o.orders === 'object' ? o.orders : {};
+  o.orders.current = cleanOrder(o.orders.current);
+  o.orders.previous = cleanOrder(o.orders.previous);
+  o.submitted = o.submitted && typeof o.submitted === 'object' ? o.submitted : {};
+  o.rolloverBackup = o.rolloverBackup || null;
+  o.lastRollover = o.lastRollover || null;
+  o.ui = Object.assign({ store: o.stores[0].id, showAll: false, tab: 'stores' }, o.ui || {});
+  if (!o.stores.some(s => s.id === o.ui.store)) o.ui.store = o.stores[0].id;
+  return o;
+}
+let S;
+function load() {
+  try { const raw = localStorage.getItem(LS_KEY); if (raw) { S = migrate(JSON.parse(raw)); return; } } catch (e) {}
+  S = seed(); save();
+}
+function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { toast('Could not save — is storage full?'); } }
+const productMap = () => new Map(S.products.map(p => [p.id, p]));
+const storeById = id => S.stores.find(s => s.id === id);
+const getQ = (kind, sid, pid) => (S.orders[kind][sid] || {})[pid] || 0;
+function setQ(sid, pid, q) {
+  const cur = S.orders.current; cur[sid] = cur[sid] || {};
+  const from = cur[sid][pid] || 0;
+  q = Math.max(0, Math.floor(q || 0));
+  if (q <= 0) delete cur[sid][pid]; else cur[sid][pid] = q;
+  save();
+  return from;
+}
+const lineCount = sid => Object.keys(S.orders.current[sid] || {}).length;
+
+// ===================== quick-add engine =====================
+function scoreProduct(p, q) {
+  let best = 0;
+  const keys = [norm(p.name)].concat(p.aliases);
+  const qw = q.split(' ');
+  for (const k of keys) {
+    if (!k) continue;
+    if (k === q) { best = 100; break; }
+    if (k.startsWith(q)) { best = Math.max(best, 80 - Math.min(19, k.length - q.length)); continue; }
+    const words = k.split(' ');
+    if (qw.every(t => words.some(w => w.startsWith(t)))) best = Math.max(best, 60 - Math.min(19, Math.max(0, k.length - q.length)));
+    else if (k.includes(q)) best = Math.max(best, 40);
+  }
+  const item = p.item;
+  if (item && /^\d+$/.test(q)) {
+    if (item === q) best = Math.max(best, 98);            // exact string compare — never numeric
+    else if (q.length >= 3 && item.startsWith(q)) best = Math.max(best, 70);
+  }
+  return best;
+}
+function readings(raw) {
+  const q = norm(raw); if (!q) return [];
+  const out = [{ name: q, qty: 1, literal: true }];
+  let m = q.match(/^(.+?)\s+(?:x|×)?\s*(\d{1,3})$/);   // "ccc 4", "ccc x4", "ccc x 4"
+  if (!m) m = q.match(/^(.+?)(?:x|×)(\d{1,3})$/);       // "cccx4"
+  if (m && +m[2] > 0) out.push({ name: m[1].trim(), qty: +m[2], literal: false });
+  return out;
+}
+function candidates(raw) {
+  const map = new Map();
+  for (const r of readings(raw)) {
+    for (const p of S.products) {
+      const sc = scoreProduct(p, r.name); if (sc <= 0) continue;
+      const score = sc + (r.literal ? 0.5 : 0);   // literal product name outranks name+qty on ties
+      const prev = map.get(p.id);
+      if (!prev || score > prev.score) map.set(p.id, { product: p, qty: r.qty, score });
+    }
+  }
+  return [...map.values()].sort((a, b) => b.score - a.score || a.product.name.localeCompare(b.product.name));
+}
+
+// ===================== toast / undo =====================
+const toastEl = $('#toast'), toastMsg = $('#toast-msg'), toastBtn = $('#toast-btn');
+let toastTimer = null, toastAction = null;
+function toast(msg, btnLabel, fn, ms) {
+  toastMsg.innerHTML = msg;
+  toastAction = fn || null;
+  toastBtn.textContent = btnLabel || '';
+  toastBtn.hidden = !btnLabel;
+  toastEl.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, ms || (btnLabel ? 5000 : 2500));
+}
+function hideToast() { toastEl.hidden = true; toastAction = null; }
+toastBtn.addEventListener('click', () => { const f = toastAction; hideToast(); if (f) f(); });
+
+// Buttons never take focus: tapping one must not close the keyboard on the quick-add input.
+for (const ev of ['pointerdown', 'mousedown']) document.addEventListener(ev, e => {
+  if (e.target.closest('button') && !e.target.closest('input,textarea')) e.preventDefault();
+});
+
+// ===================== tabs =====================
+const views = { stores: $('#view-stores'), master: $('#view-master'), cutoffs: $('#view-cutoffs'), setup: $('#view-setup') };
+const qaForm = $('#qa'), qaIn = $('#qa-in'), sugg = $('#sugg');
+function showView(name) {
+  if (!views[name]) name = 'stores';
+  for (const k in views) views[k].hidden = k !== name;
+  $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  qaForm.hidden = name !== 'stores';
+  document.body.classList.toggle('has-qa', name === 'stores');
+  S.ui.tab = name; save();
+  if (name === 'stores') { layoutTrack(false); renderPaneIfDirty(S.ui.store); }
+  if (name === 'master') renderMaster();
+  if (name === 'cutoffs') renderCutoffs();
+  if (name === 'setup') renderSetup();
+  startTick(name === 'cutoffs');
+}
+$('#tabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (t) showView(t.dataset.tab); });
+
+// ===================== stores view =====================
+const chips = $('#chips'), track = $('#track');
+const dirty = new Set();
+let idx = 0;
+const HINT = '<span class="hint"><kbd>ccc 4</kbd> = 4 cases · a bare name = 1 case · item # works too</span>';
+
+function buildTrack() {
+  track.innerHTML = S.stores.map(s => `<div class="pane" data-sid="${s.id}"><div class="colhead"><div class="c-last">Last</div><div class="c-prod"><button type="button" class="mode"></button></div><div class="c-now">This order</div></div><div class="list"></div></div>`).join('');
+  S.stores.forEach(s => dirty.add(s.id));
+  idx = Math.max(0, S.stores.findIndex(s => s.id === S.ui.store));
+  updateModeButtons();
+  layoutTrack(false);
+}
+const paneEl = sid => track.querySelector(`.pane[data-sid="${sid}"]`);
+function updateModeButtons() {
+  const label = S.ui.showAll ? 'Whole catalog' : 'On order';
+  $$('.mode', track).forEach(b => b.innerHTML = `${label} <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`);
+}
+function renderChips() {
+  chips.innerHTML = S.stores.map((s, i) => { const n = lineCount(s.id); return `<button type="button" class="chip${i === idx ? ' active' : ''}" data-i="${i}">${esc(s.short)}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
+  const a = chips.querySelector('.chip.active');
+  if (a) a.scrollIntoView({ inline: 'center', block: 'nearest', behavior: RM ? 'auto' : 'smooth' });
+}
+chips.addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) goTo(+c.dataset.i, true); });
+
+function rowHTML(p, prev, cur) {
+  return `<div class="rw" data-pid="${p.id}"><div class="under">Clear</div><div class="row${cur > 0 ? ' on' : ''}">
+<div class="prev">${prev > 0 ? prev : '<span class="z">–</span>'}</div>
+<div class="body"><div class="name">${esc(p.name)}</div><div class="item">${p.item ? esc(p.item) : '<span class="noitem">no item #</span>'}</div></div>
+<div class="qc"><button type="button" class="st" data-d="-1" aria-label="one less">−</button><div class="cur">${cur}</div><button type="button" class="st" data-d="1" aria-label="one more">+</button></div>
+</div></div>`;
+}
+function renderPane(sid) {
+  const pane = paneEl(sid); if (!pane) return;
+  const list = pane.querySelector('.list');
+  const cur = S.orders.current[sid] || {}, prev = S.orders.previous[sid] || {};
+  let html = '';
+  if (S.ui.showAll) {
+    const groups = new Map();
+    for (const p of S.products) { const c = p.category || 'Uncategorized'; if (!groups.has(c)) groups.set(c, []); groups.get(c).push(p); }
+    for (const [c, ps] of groups) { html += `<div class="cat">${esc(c)}</div>`; for (const p of ps) html += rowHTML(p, prev[p.id] || 0, cur[p.id] || 0); }
+    if (!S.products.length) html = `<div class="empty">No products yet.<br>Add them in <b>Setup</b>, or just type a name below and tap <b>Create</b>.</div>`;
+  } else {
+    const byId = productMap(); const seen = new Set(); const ids = [];
+    for (const pid in prev) if (!seen.has(pid)) { seen.add(pid); ids.push(pid); }
+    for (const pid in cur) if (!seen.has(pid)) { seen.add(pid); ids.push(pid); }
+    for (const pid of ids) { const p = byId.get(pid); if (p) html += rowHTML(p, prev[pid] || 0, cur[pid] || 0); }
+    if (!html) {
+      const st = storeById(sid);
+      html = `<div class="empty">Nothing on the order for <b>${esc(st ? st.name : '')}</b> yet.<br><br>Type a product in the box below. <kbd>ccc 4</kbd> adds 4 cases of Lance Ccc; a bare name like <kbd>nekot</kbd> adds 1 case.<br><button type="button" class="link mode">Browse the whole catalog instead</button></div>`;
+    }
+  }
+  list.innerHTML = html;
+  dirty.delete(sid);
+}
+function renderPaneIfDirty(sid) { if (dirty.has(sid)) renderPane(sid); }
+function markAllDirty() { S.stores.forEach(s => dirty.add(s.id)); }
+function patchRow(sid, pid, reveal) {
+  const pane = paneEl(sid); if (!pane) return;
+  const cur = getQ('current', sid, pid), prev = getQ('previous', sid, pid);
+  let rw = pane.querySelector(`.rw[data-pid="${pid}"]`);
+  const visible = S.ui.showAll || cur > 0 || prev > 0;
+  if (!rw || !visible) {
+    renderPane(sid);
+    rw = pane.querySelector(`.rw[data-pid="${pid}"]`);
+    if (rw && reveal) { rw.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' }); rw.classList.add('flash'); setTimeout(() => rw.classList.remove('flash'), 650); }
+    return;
+  }
+  rw.querySelector('.row').classList.toggle('on', cur > 0);
+  const c = rw.querySelector('.cur'); c.textContent = cur;
+  if (!RM) { c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); }
+  if (reveal) rw.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' });
+}
+function step(sid, pid, d) {
+  const from = getQ('current', sid, pid);
+  const to = Math.max(0, from + d);
+  if (to === from) return;
+  setQ(sid, pid, to); vib(); resetStrip();
+  patchRow(sid, pid, false); renderChips();
+  if (to === 0) {
+    const p = productMap().get(pid);
+    toast(`Removed ${esc(p ? p.name : '')} from this order`, 'Undo', () => { setQ(sid, pid, from); patchRow(sid, pid, true); renderChips(); });
+  }
+}
+function clearRow(sid, pid) {
+  const from = getQ('current', sid, pid); if (!from) return;
+  setQ(sid, pid, 0); vib(); resetStrip();
+  patchRow(sid, pid, false); renderChips();
+  const p = productMap().get(pid);
+  toast(`Cleared ${esc(p ? p.name : '')} (${from})`, 'Undo', () => { setQ(sid, pid, from); patchRow(sid, pid, true); renderChips(); });
+}
+track.addEventListener('click', e => {
+  const st = e.target.closest('.st');
+  if (st) { const rw = st.closest('.rw'), pane = st.closest('.pane'); step(pane.dataset.sid, rw.dataset.pid, +st.dataset.d); return; }
+  if (e.target.closest('.mode')) { S.ui.showAll = !S.ui.showAll; save(); updateModeButtons(); markAllDirty(); renderPane(S.ui.store); }
+});
+
+// --- sheet swipe + row swipe (pointer events; track has touch-action: pan-y so vertical scroll stays native)
+function layoutTrack(animate) {
+  const W = track.clientWidth;
+  track.style.transition = (animate && !RM) ? 'transform 280ms cubic-bezier(.2,.7,.2,1)' : 'none';
+  track.style.transform = `translateX(${-idx * W}px)`;
+}
+function goTo(i, animate) {
+  i = Math.max(0, Math.min(S.stores.length - 1, i));
+  idx = i; S.ui.store = S.stores[i].id; save();
+  layoutTrack(animate);
+  renderPaneIfDirty(S.ui.store);
+  if (i > 0) renderPaneIfDirty(S.stores[i - 1].id);
+  if (i < S.stores.length - 1) renderPaneIfDirty(S.stores[i + 1].id);
+  renderChips();
+  qaIn.placeholder = `Add to ${S.stores[i].short}…`;
+  resetStrip();
+}
+let drag = null;
+track.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lastX: e.clientX, lastT: performance.now(), vx: 0, mode: null, rw: null };
+  const qc = e.target.closest('.qc'), rw = e.target.closest('.rw');
+  if (qc && rw && rw.querySelector('.row').classList.contains('on')) drag.rw = rw;
+});
+track.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.mode) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+    if (Math.abs(dy) > Math.abs(dx)) { drag = null; return; }   // vertical: leave it to native scroll
+    drag.mode = drag.rw ? 'row' : 'sheet';
+    try { track.setPointerCapture(e.pointerId); } catch (err) {}
+    if (drag.mode === 'sheet') track.style.transition = 'none';
+    else { drag.rw.classList.add('swiping'); drag.rw.querySelector('.row').style.transition = 'none'; }
+  }
+  const now = performance.now();
+  if (now - drag.lastT > 0) drag.vx = (e.clientX - drag.lastX) / (now - drag.lastT);
+  drag.lastX = e.clientX; drag.lastT = now;
+  if (drag.mode === 'sheet') {
+    const W = track.clientWidth; let off = dx;
+    if ((idx === 0 && dx > 0) || (idx === S.stores.length - 1 && dx < 0)) off = dx / 3;
+    track.style.transform = `translateX(${-idx * W + off}px)`;
+  } else {
+    const off = Math.min(0, dx);
+    drag.rw.querySelector('.row').style.transform = `translateX(${off}px)`;
+  }
+});
+function endDrag(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  if (!d.mode) return;
+  const dx = e.clientX - d.x;
+  if (d.mode === 'sheet') {
+    const W = track.clientWidth; let t = idx;
+    if (dx < -W * 0.22 || d.vx < -0.45) t = idx + 1; else if (dx > W * 0.22 || d.vx > 0.45) t = idx - 1;
+    goTo(t, true);
+  } else {
+    const row = d.rw.querySelector('.row');
+    const pane = d.rw.closest('.pane');
+    if (e.type !== 'pointercancel' && dx < -90) {
+      row.style.transition = RM ? 'none' : 'transform 160ms ease-out';
+      row.style.transform = `translateX(${-track.clientWidth}px)`;
+      const sid = pane.dataset.sid, pid = d.rw.dataset.pid;
+      setTimeout(() => { row.style.transition = ''; row.style.transform = ''; d.rw.classList.remove('swiping'); clearRow(sid, pid); }, RM ? 0 : 160);
+    } else {
+      row.style.transition = RM ? 'none' : 'transform 200ms cubic-bezier(.2,.7,.2,1)';
+      row.style.transform = '';
+      setTimeout(() => { row.style.transition = ''; d.rw.classList.remove('swiping'); }, 220);
+    }
+  }
+}
+track.addEventListener('pointerup', endDrag);
+track.addEventListener('pointercancel', endDrag);
+window.addEventListener('resize', () => layoutTrack(false));
+
+// --- quick add (the input is never re-rendered)
+function renderSugg() {
+  const raw = qaIn.value;
+  if (!raw.trim()) { sugg.innerHTML = HINT; return; }
+  const c = candidates(raw).slice(0, 6);
+  if (!c.length) {
+    sugg.innerHTML = `<span class="hint">No match.</span><button type="button" class="sg create" data-name="${esc(raw.trim())}">＋ Create “${esc(raw.trim())}”</button>`;
+    return;
+  }
+  sugg.innerHTML = c.map((x, i) => `<button type="button" class="sg${i ? '' : ' first'}" data-pid="${x.product.id}" data-qty="${x.qty}">${esc(x.product.name)} <span class="q">×${x.qty}</span></button>`).join('');
+}
+function addProductQty(product, qty) {
+  const sid = S.ui.store;
+  const from = getQ('current', sid, product.id);
+  setQ(sid, product.id, from + qty); vib();
+  qaIn.value = '';
+  patchRow(sid, product.id, true); renderChips();
+  const st = storeById(sid);
+  sugg.innerHTML = `<span class="ok">Added <b>${qty}</b> × ${esc(product.name)} to ${esc(st.short)}</span><button type="button" class="sg undo" data-undo="1">Undo</button>`;
+  undoAdd = () => { setQ(sid, product.id, from); patchRow(sid, product.id, true); renderChips(); sugg.innerHTML = HINT; };
+  qaIn.focus();
+}
+let undoAdd = null;
+function resetStrip() { undoAdd = null; if (!qaIn.value.trim()) sugg.innerHTML = HINT; }
+function createFromQuick(name, qty) {
+  const p = { id: uid(), name: name.trim(), item: '', aliases: [norm(name)], category: 'Uncategorized' };
+  S.products.push(p); save(); markAllDirty();
+  addProductQty(p, qty);
+  toast(`Created “${esc(p.name)}” — add its item # in Setup`, 'Setup', () => { showView('setup'); openProductEditor(p.id); });
+}
+qaIn.addEventListener('input', renderSugg);
+qaIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); commitQuick(); } });
+qaForm.addEventListener('submit', e => { e.preventDefault(); commitQuick(); });
+function commitQuick() {
+  const raw = qaIn.value; if (!raw.trim()) return;
+  const c = candidates(raw);
+  if (c.length) addProductQty(c[0].product, c[0].qty);
+  else { const r = readings(raw); const last = r[r.length - 1]; createFromQuick(last.literal ? raw : raw.replace(/\s*(?:x|×)?\s*\d{1,3}$/, ''), last.qty); }
+}
+sugg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.undo) { if (undoAdd) undoAdd(); undoAdd = null; return; }
+  if (b.classList.contains('create')) { const r = readings(qaIn.value); const last = r[r.length - 1]; createFromQuick(last.literal ? b.dataset.name : b.dataset.name.replace(/\s*(?:x|×)?\s*\d{1,3}$/, ''), last.qty); return; }
+  const p = productMap().get(b.dataset.pid); if (p) addProductQty(p, +b.dataset.qty || 1);
+});
+
+// ===================== master =====================
+function masterRows() {
+  const totals = new Map();
+  for (const sid in S.orders.current) for (const pid in S.orders.current[sid]) {
+    const q = S.orders.current[sid][pid]; if (!q) continue;
+    let t = totals.get(pid); if (!t) { t = { total: 0, by: [] }; totals.set(pid, t); }
+    t.total += q; t.by.push([sid, q]);
+  }
+  // grouped by product id only — never by item number (two products share 29680)
+  return S.products.filter(p => totals.has(p.id)).map(p => Object.assign({ product: p }, totals.get(p.id)));
+}
+function renderMaster() {
+  const rows = masterRows();
+  const cases = rows.reduce((a, r) => a + r.total, 0);
+  $('#master-sub').textContent = rows.length ? `${rows.length} products · ${cases} cases` : 'this order';
+  $('#mrows').innerHTML = rows.length ? rows.map(r => `<div class="mrow"><div class="body"><div class="name">${esc(r.product.name)}</div><div class="item">${r.product.item ? esc(r.product.item) : '<i>no item #</i>'}</div><div class="by">${r.by.map(([sid, q]) => { const s = storeById(sid); return `<b>${esc(s ? s.short : sid)}</b> ${q}`; }).join(' · ')}</div></div><div class="tot">${r.total}</div></div>`).join('')
+    : `<div class="empty">Nothing on this order yet.<br>Add items on the <b>Stores</b> tab and the totals across all ${S.stores.length} stores show up here.<br><span style="color:var(--dim2);font-size:12.5px">Last order's numbers are never counted here.</span></div>`;
+  $('#btn-step').disabled = !rows.length; $('#btn-copyall').disabled = !rows.length;
+}
+function masterText() {
+  return masterRows().map(r => `${r.product.item || '(no item #)'}\t${r.total}\t${r.product.name}`).join('\n');
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
+  try { const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; } catch (e) { return false; }
+}
+$('#btn-copyall').addEventListener('click', async () => {
+  const ok = await copyText(masterText()); vib();
+  toast(ok ? 'Copied the whole master list' : 'Copy failed — try the step-through');
+});
+// pull-to-refresh (touch events so we can claim the drag only when the list is at the top)
+{
+  const ml = $('#mlist'), ptr = $('#ptr'); let sy = null, pulled = 0;
+  ml.addEventListener('touchstart', e => { sy = ml.scrollTop <= 0 ? e.touches[0].clientY : null; pulled = 0; ptr.classList.remove('spin'); }, { passive: true });
+  ml.addEventListener('touchmove', e => {
+    if (sy == null) return;
+    const dy = e.touches[0].clientY - sy;
+    if (dy > 0 && ml.scrollTop <= 0) { e.preventDefault(); pulled = Math.min(90, dy * 0.5); ptr.style.height = pulled + 'px'; ptr.textContent = pulled > 56 ? 'Release to refresh' : 'Pull to refresh'; }
+    else if (pulled) { pulled = 0; ptr.style.height = '0px'; }
+  }, { passive: false });
+  const done = () => {
+    if (sy == null) return; sy = null;
+    ptr.classList.add('spin');
+    if (pulled > 56) { ptr.textContent = 'Refreshing totals…'; ptr.style.height = '40px'; setTimeout(() => { renderMaster(); ptr.style.height = '0px'; toast('Totals refreshed'); }, 350); }
+    else ptr.style.height = '0px';
+    pulled = 0;
+  };
+  ml.addEventListener('touchend', done); ml.addEventListener('touchcancel', done);
+}
+
+// --- OTS step-through
+$('#btn-step').addEventListener('click', openStep);
+function openStep() {
+  const rows = masterRows(); if (!rows.length) return;
+  let k = 0;
+  const sh = openSheet({ full: true, html: `<div class="step" id="step">
+<div><div class="pos" id="st-pos"></div><div class="pname" id="st-name"></div><div class="pcat" id="st-cat"></div></div>
+<button type="button" class="big" id="st-item"><div class="lbl">Item number</div><div class="val" id="st-item-v"></div><div class="tip">tap to copy</div></button>
+<button type="button" class="big cases" id="st-qty"><div class="lbl">Cases</div><div class="val" id="st-qty-v"></div><div class="tip">tap to copy</div></button>
+<div class="nav"><button type="button" class="btn" id="st-prev">‹ Prev</button><button type="button" class="btn primary" id="st-next">Next ›</button></div>
+</div>`, title: 'Key into OTS', sub: 'Swipe down to close · swipe sideways for next / prev' });
+  const el = sh.el;
+  const draw = () => {
+    const r = rows[k];
+    $('#st-pos', el).textContent = `${k + 1} of ${rows.length}`;
+    $('#st-name', el).textContent = r.product.name;
+    $('#st-cat', el).textContent = r.by.map(([sid, q]) => { const s = storeById(sid); return `${s ? s.short : sid} ${q}`; }).join(' · ');
+    const iv = $('#st-item-v', el);
+    if (r.product.item) { iv.textContent = r.product.item; iv.classList.remove('missing'); } else { iv.textContent = 'no item number — add it in Setup'; iv.classList.add('missing'); }
+    $('#st-qty-v', el).textContent = r.total;
+    $('#st-prev', el).disabled = k === 0;
+    $('#st-next', el).textContent = k === rows.length - 1 ? 'Done' : 'Next ›';
+    $$('.big', el).forEach(b => { b.classList.remove('copied'); b.querySelector('.tip').textContent = 'tap to copy'; });
+  };
+  const copyBlock = async (btn, text) => {
+    if (!text) return;
+    const ok = await copyText(text); vib();
+    btn.classList.add('copied'); btn.querySelector('.tip').textContent = ok ? 'Copied' : 'Copy failed';
+    setTimeout(() => { btn.classList.remove('copied'); btn.querySelector('.tip').textContent = 'tap to copy'; }, 900);
+  };
+  $('#st-item', el).addEventListener('click', e => copyBlock(e.currentTarget, rows[k].product.item));
+  $('#st-qty', el).addEventListener('click', e => copyBlock(e.currentTarget, String(rows[k].total)));
+  const next = () => { if (k < rows.length - 1) { k++; draw(); } else sh.close(); };
+  const prev = () => { if (k > 0) { k--; draw(); } };
+  $('#st-next', el).addEventListener('click', next);
+  $('#st-prev', el).addEventListener('click', prev);
+  sh.onSwipeX = dx => { if (dx < 0) next(); else prev(); };
+  draw();
+}
+
+// ===================== generic bottom sheet =====================
+const overlayRoot = $('#overlay-root');
+function openSheet({ html, title, sub, full, onClose }) {
+  const bd = document.createElement('div'); bd.className = 'backdrop';
+  bd.innerHTML = `<div class="sheet${full ? ' full' : ''}${RM ? '' : ' enter'}"><div class="sheet-head"><div class="handle"></div>${title ? `<div class="sheet-title">${esc(title)}</div>` : ''}${sub ? `<div class="sheet-sub">${esc(sub)}</div>` : ''}</div><div class="sheet-body">${html}</div></div>`;
+  overlayRoot.appendChild(bd);
+  const sheet = bd.querySelector('.sheet');
+  const api = { el: sheet, onSwipeX: null, close };
+  let closed = false;
+  function close() {
+    if (closed) return; closed = true;
+    if (RM) { bd.remove(); } else { sheet.style.transition = 'transform 200ms ease-in'; sheet.style.transform = 'translateY(100%)'; setTimeout(() => bd.remove(), 200); }
+    document.removeEventListener('keydown', onKey);
+    if (onClose) onClose();
+  }
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  bd.addEventListener('click', e => { if (e.target === bd) close(); });
+  // drag to dismiss: from the head always; from anywhere on a full sheet (its body isn't a scroller)
+  const zone = full ? sheet : sheet.querySelector('.sheet-head');
+  if (full) zone.style.touchAction = 'none';
+  let d = null;
+  zone.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button !== 0) return; d = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), mode: null }; });
+  zone.addEventListener('pointermove', e => {
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.mode) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      d.mode = Math.abs(dy) >= Math.abs(dx) ? 'y' : 'x';
+      try { zone.setPointerCapture(e.pointerId); } catch (err) {}
+      sheet.style.transition = 'none';
+    }
+    if (d.mode === 'y') sheet.style.transform = `translateY(${Math.max(0, dy)}px)`;
+  });
+  const end = e => {
+    if (!d || e.pointerId !== d.id) return;
+    const dd = d; d = null; if (!dd.mode) return;
+    const dx = e.clientX - dd.x, dy = e.clientY - dd.y, dt = Math.max(1, performance.now() - dd.t);
+    if (dd.mode === 'y') {
+      if (e.type !== 'pointercancel' && (dy > 110 || dy / dt > 0.6)) { close(); return; }
+      sheet.style.transition = RM ? 'none' : 'transform 220ms cubic-bezier(.2,.7,.2,1)'; sheet.style.transform = 'translateY(0)';
+    } else if (api.onSwipeX && e.type !== 'pointercancel' && (Math.abs(dx) > 70 || Math.abs(dx) / dt > 0.5)) api.onSwipeX(dx);
+  };
+  zone.addEventListener('pointerup', end); zone.addEventListener('pointercancel', end);
+  return api;
+}
+function confirmSheet({ title, body, okLabel, danger, onOk }) {
+  const sh = openSheet({ title, html: `<p style="color:var(--dim);line-height:1.5;margin:4px 0 8px">${body}</p><div class="btnrow"><button type="button" class="btn" id="cf-no">Cancel</button><button type="button" class="btn ${danger ? 'danger' : 'primary'}" id="cf-ok">${esc(okLabel || 'OK')}</button></div>` });
+  $('#cf-no', sh.el).addEventListener('click', sh.close);
+  $('#cf-ok', sh.el).addEventListener('click', () => { sh.close(); onOk(); });
+}
+
+// ===================== cutoffs =====================
+const TZ = 'America/New_York';
+const dtf = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', weekday: 'short' });
+function zoneParts(date) { const p = {}; for (const { type, value } of dtf.formatToParts(date)) p[type] = value; return { y: +p.year, m: +p.month, d: +p.day, h: +p.hour % 24, mi: +p.minute, s: +p.second }; }
+function zoneOffsetMs(date) { const p = zoneParts(date); return Date.UTC(p.y, p.m - 1, p.d, p.h, p.mi, p.s) - Math.floor(date.getTime() / 1000) * 1000; }
+function zonedToUtc(y, m, d, h, mi) {   // wall-clock in ET -> instant; offset probed, never hardcoded
+  const guess = Date.UTC(y, m - 1, d, h, mi);
+  let t = guess - zoneOffsetMs(new Date(guess));
+  const off2 = zoneOffsetMs(new Date(t)); if (guess - off2 !== t) t = guess - off2;
+  return new Date(t);
+}
+function nextCutoff(now, weekday) {   // weekday: 2 = Tue, 6 = Sat; cutoff 07:30 ET
+  const p = zoneParts(now);
+  for (let i = 0; i <= 7; i++) {
+    const dt = new Date(Date.UTC(p.y, p.m - 1, p.d + i));
+    if (dt.getUTCDay() !== weekday) continue;
+    const c = zonedToUtc(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate(), 7, 30);
+    if (c.getTime() > now.getTime()) return c;
+  }
+  return null;
+}
+const fmtLong = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const fmtDay = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'long', month: 'short', day: 'numeric' });
+const fmtStamp = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+function countdown(ms) {
+  if (ms <= 0) return 'now';
+  const s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+  const pad = n => String(n).padStart(2, '0');
+  return d > 0 ? `${d}d ${pad(h)}h ${pad(m)}m` : `${h}h ${pad(m)}m ${pad(sec)}s`;
+}
+function cycles(now) {
+  const list = [
+    { key: 'tue', label: 'Tuesday 7:30 AM', pickup: 'Thursday', at: nextCutoff(now, 2), pickupDays: 2 },
+    { key: 'sat', label: 'Saturday 7:30 AM', pickup: 'Tuesday', at: nextCutoff(now, 6), pickupDays: 3 },
+  ].filter(c => c.at);
+  list.sort((a, b) => a.at - b.at);
+  return list;
+}
+let tick = null;
+function startTick(on) { clearInterval(tick); tick = null; if (on) tick = setInterval(tickCutoffs, 1000); }
+function tickCutoffs() {
+  const now = new Date();
+  $$('[data-cd]').forEach(el => { const at = +el.dataset.cd; if (now.getTime() >= at) renderCutoffs(); else el.textContent = countdown(at - now.getTime()); });
+}
+function renderCutoffs() {
+  const now = new Date(); const cs = cycles(now);
+  const cases = masterRows().reduce((a, r) => a + r.total, 0);
+  const lines = masterRows().length;
+  let html = cs.map((c, i) => {
+    const iso = c.at.toISOString(); const sub = !!S.submitted[iso];
+    const pickup = new Date(c.at.getTime() + c.pickupDays * 86400000);
+    return `<div class="card${i === 0 ? ' next' : ''}"><div class="k">${i === 0 ? 'Next cutoff' : 'Then'} · ${c.label} ET</div><div class="big2" data-cd="${c.at.getTime()}">${countdown(c.at - now)}</div><div class="when">${fmtLong.format(c.at)} → pickup <b>${fmtDay.format(pickup)}</b></div><div class="row2"><span style="color:var(--dim);font-size:13px">${sub ? 'Order submitted in OTS' : 'Not submitted yet'}</span><button type="button" class="check${sub ? ' on' : ''}" data-sub="${iso}"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>${sub ? 'Submitted' : 'Mark submitted'}</button></div></div>`;
+  }).join('');
+  html += `<div class="note">This app can't wake your phone before a cutoff — there's no server behind it. Set a phone alarm for Monday and Friday evening.</div>`;
+  html += `<div class="card"><div class="k">Rollover</div><p>After you've keyed the order into OTS, roll it over: <b>this order</b> (${lines} products, ${cases} cases) becomes <b>last order</b> on every store sheet, and this order starts empty.</p><p>Only happens when you tap and confirm — never automatically.</p><div class="row2"><span style="color:var(--dim2);font-size:12.5px">${S.lastRollover ? 'Last rollover ' + fmtStamp.format(new Date(S.lastRollover)) : 'No rollover yet'}</span><button type="button" class="btn primary" id="btn-rollover"${lines ? '' : ' disabled'}>Roll over…</button></div>${S.rolloverBackup ? `<div class="btnrow"><button type="button" class="btn" id="btn-unroll">Undo last rollover</button></div>` : ''}</div>`;
+  $('#cutoffs').innerHTML = html;
+}
+$('#cutoffs').addEventListener('click', e => {
+  const sb = e.target.closest('[data-sub]');
+  if (sb) { const k = sb.dataset.sub; if (S.submitted[k]) delete S.submitted[k]; else S.submitted[k] = true; save(); vib(); renderCutoffs(); return; }
+  if (e.target.closest('#btn-rollover')) {
+    const lines = masterRows().length, cases = masterRows().reduce((a, r) => a + r.total, 0);
+    confirmSheet({ title: 'Roll over to the next order?', body: `This order — <b>${lines} products, ${cases} cases</b> — becomes the dim “last order” column on every store. This order resets to empty.<br><br>Last order's current numbers are replaced. You can undo this from the Cutoffs tab.`, okLabel: 'Roll over', onOk: doRollover });
+    return;
+  }
+  if (e.target.closest('#btn-unroll')) {
+    confirmSheet({ title: 'Undo the last rollover?', body: 'Puts back the order you rolled over as “this order”, and restores the previous “last order” column. Anything you added since the rollover is lost.', okLabel: 'Undo rollover', danger: true, onOk: undoRollover });
+  }
+});
+function doRollover() {
+  S.rolloverBackup = { previous: clone(S.orders.previous), current: clone(S.orders.current), at: Date.now() };
+  S.orders.previous = clone(S.orders.current);
+  S.orders.current = {};
+  S.lastRollover = Date.now();
+  save(); vib(); markAllDirty(); renderChips(); renderCutoffs();
+  toast('Rolled over — this order is now empty', 'Undo', undoRollover);
+}
+function undoRollover() {
+  const b = S.rolloverBackup; if (!b) return;
+  S.orders.previous = clone(b.previous); S.orders.current = clone(b.current);
+  S.rolloverBackup = null; S.lastRollover = null;
+  save(); vib(); markAllDirty(); renderChips(); renderCutoffs();
+  toast('Rollover undone');
+}
+
+// ===================== setup =====================
+function renderSetup() {
+  $('#setup-sub').textContent = `${S.products.length} products`;
+  const cats = [...new Set(S.products.map(p => p.category || 'Uncategorized'))];
+  const q = norm(setupFilter);
+  const shown = q ? S.products.filter(p => scoreProduct(p, q) > 0 || norm(p.category).includes(q)) : S.products;
+  $('#setup').innerHTML = `
+<div class="sec">Stores</div>
+${S.stores.map(s => `<div class="li"><input class="long" data-store="${s.id}" data-f="name" value="${esc(s.name)}" aria-label="store name"><input class="short" data-store="${s.id}" data-f="short" value="${esc(s.short)}" maxlength="6" aria-label="short label"></div>`).join('')}
+<div class="note" style="margin-top:8px">The short label is what the chips and the master list use.</div>
+<div class="sec">Products <span>${cats.length} categories</span></div>
+<div class="stack"><button type="button" class="btn primary" id="btn-addprod">＋ Add product</button><button type="button" class="btn" id="btn-bulk">Bulk paste</button></div>
+<div class="search"><input type="search" id="setup-q" placeholder="Filter products…" value="${esc(setupFilter)}" autocomplete="off"></div>
+<div id="plist">${shown.map(p => `<button type="button" class="li" data-edit="${p.id}"><div class="body"><div class="name">${esc(p.name)}</div><div class="meta">${p.item ? esc(p.item) : '<i>no item #</i>'} · ${esc(p.category || 'Uncategorized')} · ${esc(p.aliases.join(', ') || 'no shorthand')}</div></div><span class="chev">›</span></button>`).join('') || '<div class="empty">No products match.</div>'}</div>
+<div class="sec">Backup</div>
+<div class="stack"><button type="button" class="btn" id="btn-export">Download backup</button><button type="button" class="btn" id="btn-copyjson">Copy JSON</button></div>
+<div class="stack"><label class="btn filebtn">Import backup file<input type="file" accept="application/json,.json" id="file-import"></label><button type="button" class="btn" id="btn-pastejson">Paste backup</button></div>
+<div class="note">Everything lives on this phone only. There's no sync — move data between phones with a backup file.</div>
+<div class="sec">Danger zone</div>
+<div class="stack"><button type="button" class="btn ghost" id="btn-reset">Reset to the starter catalog…</button></div>`;
+}
+let setupFilter = '';
+const setupEl = $('#setup');
+setupEl.addEventListener('input', e => {
+  if (e.target.id === 'setup-q') { setupFilter = e.target.value; const q = norm(setupFilter); const shown = q ? S.products.filter(p => scoreProduct(p, q) > 0 || norm(p.category).includes(q)) : S.products; $('#plist').innerHTML = shown.map(p => `<button type="button" class="li" data-edit="${p.id}"><div class="body"><div class="name">${esc(p.name)}</div><div class="meta">${p.item ? esc(p.item) : '<i>no item #</i>'} · ${esc(p.category || 'Uncategorized')} · ${esc(p.aliases.join(', ') || 'no shorthand')}</div></div><span class="chev">›</span></button>`).join('') || '<div class="empty">No products match.</div>'; }
+});
+setupEl.addEventListener('change', e => {
+  const inp = e.target;
+  if (inp.dataset.store) {
+    const s = storeById(inp.dataset.store); if (!s) return;
+    const v = inp.value.trim();
+    if (inp.dataset.f === 'name') { if (v) s.name = v; else inp.value = s.name; }
+    else { s.short = v || shortName(s.name); inp.value = s.short; }
+    save(); renderChips(); markAllDirty(); qaIn.placeholder = `Add to ${storeById(S.ui.store).short}…`;
+  }
+  if (inp.id === 'file-import') {
+    const f = inp.files && inp.files[0]; if (!f) return;
+    const rd = new FileReader(); rd.onload = () => importJSON(String(rd.result)); rd.readAsText(f); inp.value = '';
+  }
+});
+setupEl.addEventListener('click', e => {
+  const ed = e.target.closest('[data-edit]'); if (ed) { openProductEditor(ed.dataset.edit); return; }
+  if (e.target.closest('#btn-addprod')) { openProductEditor(null); return; }
+  if (e.target.closest('#btn-bulk')) { openBulk(); return; }
+  if (e.target.closest('#btn-export')) { exportBackup(); return; }
+  if (e.target.closest('#btn-copyjson')) { copyText(backupJSON()).then(ok => toast(ok ? 'Backup JSON copied' : 'Copy failed')); return; }
+  if (e.target.closest('#btn-pastejson')) { openPasteImport(); return; }
+  if (e.target.closest('#btn-reset')) {
+    confirmSheet({ title: 'Reset everything?', body: 'Replaces your stores, products and <b>both orders</b> with the starter catalog. Download a backup first if you might want this back.', okLabel: 'Reset', danger: true, onOk: () => { S = seed(); save(); renderAll(); toast('Reset to the starter catalog'); } });
+  }
+});
+function openProductEditor(pid) {
+  const p = pid ? productMap().get(pid) : null;
+  const cats = [...new Set(S.products.map(x => x.category || 'Uncategorized'))].sort();
+  const sh = openSheet({ title: p ? 'Edit product' : 'New product', html: `
+<label class="fld"><span>Name</span><input id="pe-name" value="${esc(p ? p.name : '')}" autocapitalize="words"></label>
+<label class="fld"><span>Item number</span><input id="pe-item" inputmode="numeric" value="${esc(p ? p.item : '')}" placeholder="e.g. 080060"><div class="help">Kept exactly as typed — leading zeros stay.</div></label>
+<label class="fld"><span>Shorthand (what quick-add matches, comma separated)</span><input id="pe-alias" value="${esc(p ? p.aliases.join(', ') : '')}" placeholder="e.g. ccc, lance ccc" autocapitalize="none"></label>
+<label class="fld"><span>Category</span><input id="pe-cat" list="pe-cats" value="${esc(p ? p.category : '')}" placeholder="Uncategorized" autocapitalize="words"><datalist id="pe-cats">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist></label>
+<div class="btnrow">${p ? '<button type="button" class="btn danger" id="pe-del">Delete</button>' : ''}<button type="button" class="btn primary" id="pe-save">Save</button></div>` });
+  const el = sh.el;
+  $('#pe-save', el).addEventListener('click', () => {
+    const name = $('#pe-name', el).value.trim(); if (!name) { $('#pe-name', el).focus(); return; }
+    const item = $('#pe-item', el).value.trim();   // string, untouched
+    const aliases = splitAliases($('#pe-alias', el).value);
+    if (!aliases.length) aliases.push(norm(name));
+    const category = $('#pe-cat', el).value.trim() || 'Uncategorized';
+    if (p) Object.assign(p, { name, item, aliases, category });
+    else S.products.push({ id: uid(), name, item, aliases, category });
+    save(); vib(); markAllDirty(); sh.close(); renderSetup();
+    toast(p ? 'Saved' : `Added “${esc(name)}”`);
+  });
+  const del = $('#pe-del', el);
+  if (del) del.addEventListener('click', () => {
+    if (!del.dataset.armed) { del.dataset.armed = '1'; del.textContent = 'Tap again to delete'; setTimeout(() => { del.dataset.armed = ''; del.textContent = 'Delete'; }, 2500); return; }
+    S.products = S.products.filter(x => x.id !== p.id);
+    for (const kind of ['current', 'previous']) for (const sid in S.orders[kind]) delete S.orders[kind][sid][p.id];
+    save(); vib(); markAllDirty(); sh.close(); renderSetup(); renderChips();
+    toast(`Deleted “${esc(p.name)}”`);
+  });
+  setTimeout(() => $('#pe-name', el).focus(), 50);
+}
+function openBulk() {
+  const sh = openSheet({ title: 'Bulk paste products', html: `
+<label class="fld"><span>One product per line</span><textarea id="bulk-t" placeholder="Lance Ccc | 115344 | ccc, lance ccc | Lance&#10;Mini | 080060 | mini | Snyder's" autocapitalize="none"></textarea>
+<div class="help">Fields separated by <code>|</code> or tabs: <code>Name | item # | shorthand, more shorthand | Category</code>. Only the name is required. A line whose name matches an existing product updates it.</div></label>
+<div class="btnrow"><button type="button" class="btn primary" id="bulk-go">Import</button></div>` });
+  $('#bulk-go', sh.el).addEventListener('click', () => {
+    const txt = $('#bulk-t', sh.el).value; let added = 0, updated = 0;
+    const byName = new Map(S.products.map(p => [norm(p.name), p]));
+    for (const line of txt.split(/\r?\n/)) {
+      if (!line.trim() || line.trim().startsWith('#')) continue;
+      const f = line.split(/\t|\|/).map(x => x.trim());
+      const name = f[0]; if (!name) continue;
+      const item = f[1] || '', aliases = splitAliases(f[2] || ''), category = f[3] || '';
+      const ex = byName.get(norm(name));
+      if (ex) { if (item) ex.item = item; if (aliases.length) ex.aliases = [...new Set(ex.aliases.concat(aliases))]; if (category) ex.category = category; updated++; }
+      else { const p = { id: uid(), name, item, aliases: aliases.length ? aliases : [norm(name)], category: category || 'Uncategorized' }; S.products.push(p); byName.set(norm(name), p); added++; }
+    }
+    save(); vib(); markAllDirty(); sh.close(); renderSetup();
+    toast(`Imported: ${added} added, ${updated} updated`);
+  });
+  setTimeout(() => $('#bulk-t', sh.el).focus(), 50);
+}
+function backupJSON() { return JSON.stringify({ app: 'snackroute', version: 1, exportedAt: new Date().toISOString(), data: S }, null, 1); }
+function exportBackup() {
+  try {
+    const blob = new Blob([backupJSON()], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `snack-route-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('Backup downloaded');
+  } catch (e) { toast('Download failed — use Copy JSON instead'); }
+}
+function importJSON(text) {
+  let obj; try { obj = JSON.parse(text); } catch (e) { toast('That is not valid JSON'); return; }
+  const data = obj && obj.data && obj.data.stores ? obj.data : obj;
+  if (!data || !Array.isArray(data.stores) || !Array.isArray(data.products)) { toast('That file is not a Snack Route backup'); return; }
+  const inc = migrate(clone(data));
+  const cases = Object.values(inc.orders.current).reduce((a, st) => a + Object.values(st).reduce((x, y) => x + y, 0), 0);
+  confirmSheet({ title: 'Replace everything with this backup?', body: `The backup has <b>${inc.products.length} products</b>, ${inc.stores.length} stores and ${cases} cases on its current order${obj.exportedAt ? ' (exported ' + esc(obj.exportedAt.slice(0, 10)) + ')' : ''}. Your data on this phone is replaced.`, okLabel: 'Import', danger: true, onOk: () => { S = inc; save(); renderAll(); toast('Backup imported'); } });
+}
+function openPasteImport() {
+  const sh = openSheet({ title: 'Paste a backup', html: `<label class="fld"><span>Backup JSON</span><textarea id="paste-t" autocapitalize="none" spellcheck="false"></textarea></label><div class="btnrow"><button type="button" class="btn primary" id="paste-go">Import</button></div>` });
+  $('#paste-go', sh.el).addEventListener('click', () => { const t = $('#paste-t', sh.el).value; sh.close(); importJSON(t); });
+  setTimeout(() => $('#paste-t', sh.el).focus(), 50);
+}
+
+// ===================== boot =====================
+function renderAll() {
+  buildTrack(); goTo(idx, false); renderChips(); sugg.innerHTML = HINT;
+  if (!views.master.hidden) renderMaster();
+  if (!views.cutoffs.hidden) renderCutoffs();
+  if (!views.setup.hidden) renderSetup();
+}
+load();
+renderAll();
+showView(S.ui.tab);
+
+// update-ready notice (the SW takes over on next load; nothing here blocks anything)
+if ('serviceWorker' in navigator) navigator.serviceWorker.ready.then(reg => {
+  reg.addEventListener('updatefound', () => {
+    const w = reg.installing; if (!w) return;
+    w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) toast('Update ready', 'Reload', () => location.reload(), 8000); });
+  });
+}).catch(() => {});
+})();
+</script>
+</body>
+</html>
