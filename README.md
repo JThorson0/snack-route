@@ -15,6 +15,12 @@ across seven stores and combining it into one master list for keying into OTS.
 redeploys in about a minute. Open it in Chrome on the phone and choose
 "Add to Home screen" / "Install app".
 
+## Demo data
+
+Open `https://jthorson0.github.io/snack-route/?demo` once to load a realistic
+"last order submitted and rolled over" state across all seven stores. Setup →
+Reset clears it.
+
 ## Run locally
 
 ```bash

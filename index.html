@@ -140,6 +140,8 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stro
 .sg.first{background:var(--text);color:var(--ink)}
 .sg .q{font-size:12px;font-weight:900;min-width:24px;height:22px;padding:0 7px;border-radius:11px;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center}
 .sg.first .q{background:var(--sc);color:var(--ink)}
+.sg .last{font-size:11px;font-weight:800;color:var(--dim);letter-spacing:.02em}
+.sg.first .last{color:var(--ink);opacity:.6}
 .sg.create,.sg.undo{padding-right:13px}
 .sg.undo{color:var(--ink);background:var(--sc);margin-left:auto;font-weight:900}
 .qa-row{position:relative;display:flex;margin-top:2px}
@@ -782,7 +784,7 @@ function renderSugg() {
     sugg.innerHTML = `<span class="hint">No match.</span><button type="button" class="sg create" data-name="${esc(raw.trim())}">＋ Create “${esc(raw.trim())}”</button>`;
     return;
   }
-  sugg.innerHTML = c.map((x, i) => `<button type="button" class="sg${i ? '' : ' first'}" data-pid="${x.product.id}" data-qty="${x.qty}">${esc(x.product.name)} <span class="q">×${x.qty}</span></button>`).join('');
+  sugg.innerHTML = c.map((x, i) => { const last = getQ('previous', S.ui.store, x.product.id); return `<button type="button" class="sg${i ? '' : ' first'}" data-pid="${x.product.id}" data-qty="${x.qty}">${esc(x.product.name)} <span class="q">×${x.qty}</span>${last ? `<span class="last">last ${last}</span>` : ''}</button>`; }).join('');
 }
 function addProductQty(product, qty) {
   const sid = S.ui.store;
@@ -1257,6 +1259,27 @@ function renderAll() {
   if (!views.setup.hidden) renderSetup();
 }
 load();
+// ?demo — load a realistic "last order was submitted and rolled over" state so the two-column view can be seen.
+// One-shot: the param is removed from the URL. Setup → Reset clears it again.
+if (new URLSearchParams(location.search).has('demo')) {
+  const ids = productMap();
+  const only = o => { const out = {}; for (const sid in o) { out[sid] = {}; for (const pid in o[sid]) if (ids.has(pid)) out[sid][pid] = o[sid][pid]; } return out; };
+  S.orders.previous = only({
+    s1: { p1: 6, p2: 2, p3: 2, p8: 3, p17: 2, p19: 1, p20: 2, p27: 2 },
+    s2: { p1: 4, p2: 1, p7: 2, p14: 1, p19: 2 },
+    s3: { p1: 3, p3: 1, p11: 2, p13: 1, p18: 2 },
+    s4: { p1: 5, p4: 2, p10: 1, p15: 2, p16: 1 },
+    s5: { p1: 2, p2: 2, p12: 1, p19: 1, p27: 3 },
+    s6: { p1: 2, p24: 2, p25: 1, p26: 2 },
+    s7: { p1: 3, p24: 1, p26: 1, p27: 1 }
+  });
+  S.orders.current = only({ s1: { p1: 2, p20: 1 } });
+  S.lastRollover = Date.now() - 2 * 86400000;
+  S.rolloverBackup = null;
+  S.ui.store = S.stores[0].id; S.ui.tab = 'stores'; S.ui.showAll = false;
+  save();
+  history.replaceState(null, '', location.pathname);
+}
 renderAll();
 showView(S.ui.tab);
 
