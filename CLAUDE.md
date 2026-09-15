@@ -37,9 +37,11 @@ original "one accent color" line in the spec — the user asked for it.
 - Buttons `preventDefault` on pointerdown/mousedown so tapping them never steals
   focus from the quick-add input (which would close the keyboard).
 - Sheet swipe = horizontal drag on the pane (touch-action: pan-y, pointer
-  events, axis lock). Row-clear swipe = horizontal drag that *starts on the
-  −/qty/+ cluster* of a row that's on the order. This is how the two horizontal
-  gestures coexist.
+  events, axis lock). Swipe **left on a row that's on the order** clears that row
+  (undoable); swipe right anywhere, or left on the header/empty space/off-order
+  rows, switches store. Master rows swipe left to drop a product from every
+  store. Header trash buttons clear a store / the whole order — always confirm
+  sheet + Undo toast, and never touch the previous order.
 - Suggestion strip above the input has a fixed height so the list never shifts.
 - Respect `prefers-reduced-motion`.
 

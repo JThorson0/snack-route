@@ -42,6 +42,11 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stro
 .hdr{flex:none;padding:calc(var(--sat) + 20px) 20px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .hdr h1{font-size:34px;font-weight:900;margin:0;letter-spacing:-.03em;line-height:1}
 .hdr .sub{color:var(--dim);font-size:13px;white-space:nowrap;padding-bottom:4px;font-weight:600}
+.hdr .right{display:flex;align-items:center;gap:10px}
+.hdr .ib{width:44px;height:44px;border-radius:14px;background:var(--surface);color:var(--text);display:inline-flex;align-items:center;justify-content:center;transition:transform 80ms}
+.hdr .ib:active{transform:scale(.92)}
+.hdr .ib svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hdr .ib[disabled]{opacity:.3}
 
 /* ---------- store switcher ---------- */
 .chips{flex:none;display:flex;gap:8px;padding:calc(var(--sat) + 12px) 16px 10px;overflow-x:auto;scrollbar-width:none}
@@ -53,12 +58,16 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stro
 .chip .n{font-size:12px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--surface3);color:var(--text);font-weight:800;display:inline-flex;align-items:center;justify-content:center}
 .chip.active .n{background:rgba(0,0,0,.22);color:var(--ink)}
 .stitle{flex:none;margin:0 12px 10px;padding:18px 18px 16px;border-radius:var(--r);background:var(--sc);color:var(--ink);position:relative}
-.stitle h2{margin:0;font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1.05;padding-right:52px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stitle h2{margin:0;font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1.05;padding-right:104px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stitle .sum{display:flex;align-items:flex-end;gap:22px;margin-top:12px}
 .stitle .sum .lg{display:flex;flex-direction:column;line-height:1}
 .stitle .sum .lg .v{font-size:44px;font-weight:900;letter-spacing:-.05em}
 .stitle .sum .lg .l{font-size:12px;font-weight:700;opacity:.7;margin-top:6px;letter-spacing:.02em}
 .stitle .sum .lg.last .v{font-size:26px;opacity:.55;margin-bottom:2px}
+.stitle .ib{position:absolute;top:14px;width:44px;height:44px;border-radius:14px;background:rgba(0,0,0,.18);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;transition:background 140ms,transform 80ms}
+.stitle .ib:active{transform:scale(.92)}
+.stitle .ib svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.stitle .clear{right:64px}
 .stitle .mode{position:absolute;right:14px;top:14px;width:44px;height:44px;border-radius:14px;background:rgba(0,0,0,.18);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;transition:background 140ms}
 .stitle .mode.all{background:var(--ink);color:var(--sc)}
 .stitle .mode svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
@@ -201,8 +210,13 @@ body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 2px)}
 .hero .side .bar{display:flex;gap:3px;justify-content:flex-end;margin-top:8px}
 .hero .side .bar i{width:14px;height:6px;border-radius:3px;background:rgba(0,0,0,.15)}
 .hero .side .bar i.on{background:var(--c)}
-.mrow{position:relative;display:flex;align-items:center;padding:12px 12px 12px 20px;gap:12px;min-height:66px;background:var(--bg)}
-.mrow + .mrow::before{content:"";position:absolute;left:20px;right:0;top:0;height:1px;background:var(--line)}
+.mrw{position:relative;overflow:hidden}
+.mrw .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;background:var(--danger);color:#fff;font-weight:900;font-size:13px;letter-spacing:.06em;text-transform:uppercase;opacity:0}
+.mrw.swiping .under{opacity:1}
+.mrow{position:relative;display:flex;align-items:center;padding:12px 12px 12px 20px;gap:12px;min-height:66px;background:var(--bg);user-select:none;-webkit-user-select:none}
+.mrw + .mrw .mrow::before{content:"";position:absolute;left:20px;right:0;top:0;height:1px;background:var(--line)}
+.mlist{touch-action:pan-y}
+.swipe-hint{padding:10px 20px 0;color:var(--dim2);font-size:12px;font-weight:600;text-align:center}
 .mrow .body{flex:1;min-width:0}
 .mrow .name{font-weight:800;font-size:16.5px;letter-spacing:-.015em}
 .mrow .item{font-size:12px;color:var(--dim2);letter-spacing:.06em;margin-top:2px;font-weight:600}
@@ -308,7 +322,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').ca
   </section>
 
   <section class="view" id="view-master" hidden>
-    <div class="hdr"><h1>Master</h1><div class="sub" id="master-sub"></div></div>
+    <div class="hdr"><h1>Master</h1><div class="right"><div class="sub" id="master-sub"></div><button type="button" class="ib" id="btn-clearall" aria-label="Clear this order"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div></div>
     <div class="mlist" id="mlist"><div class="ptr" id="ptr">Refreshing totals…</div><div class="hero" id="master-hero"></div><div class="group" id="mrows"></div></div>
     <div class="actions">
       <button class="btn" id="btn-copyall"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy all</button>
@@ -545,7 +559,7 @@ let idx = 0;
 const HINT = '<span class="hint"><kbd>ccc 4</kbd> = 4 cases · a bare name = 1 case · item # works too</span>';
 
 function buildTrack() {
-  track.innerHTML = S.stores.map(s => `<div class="pane" data-sid="${s.id}" style="--sc:${s.color}"><div class="stitle"><div style="min-width:0;flex:1"><h2>${esc(s.name)}</h2><div class="sum"></div></div><button type="button" class="mode"></button></div><div class="list"></div></div>`).join('');
+  track.innerHTML = S.stores.map(s => `<div class="pane" data-sid="${s.id}" style="--sc:${s.color}"><div class="stitle"><div style="min-width:0;flex:1"><h2>${esc(s.name)}</h2><div class="sum"></div></div><button type="button" class="ib clear" aria-label="Clear this store's order"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button><button type="button" class="ib mode"></button></div><div class="list"></div></div>`).join('');
   S.stores.forEach(s => dirty.add(s.id));
   idx = Math.max(0, S.stores.findIndex(s => s.id === S.ui.store));
   updateModeButtons();
@@ -597,7 +611,7 @@ function renderPane(sid) {
     if (html) html = `<div class="group">${html}</div>`;
     if (!html) {
       const st = storeById(sid);
-      html = `<div class="empty"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><path d="M17 15v6M14 18h6"/></svg></div><br>Nothing on the order for <b>${esc(st ? st.name : '')}</b> yet.<br><br>Type a product in the box below — <kbd>ccc 4</kbd> adds 4 cases of Lance Ccc, a bare name like <kbd>nekot</kbd> adds 1.<br><button type="button" class="link mode"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Browse the whole catalog</button></div>`;
+      html = `<div class="empty"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><path d="M17 15v6M14 18h6"/></svg></div><br>Nothing on the order for <b>${esc(st ? st.name : '')}</b> yet.<br><br>Type a product in the box below — <kbd>ccc 4</kbd> adds 4 cases of Lance Ccc, a bare name like <kbd>nekot</kbd> adds 1. Swipe a row left to clear it.<br><button type="button" class="link mode"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Browse the whole catalog</button></div>`;
     }
   }
   list.innerHTML = html;
@@ -644,7 +658,13 @@ function clearRow(sid, pid) {
 track.addEventListener('click', e => {
   const st = e.target.closest('.st');
   if (st) { const rw = st.closest('.rw'), pane = st.closest('.pane'); step(pane.dataset.sid, rw.dataset.pid, +st.dataset.d); return; }
-  if (e.target.closest('.mode')) { S.ui.showAll = !S.ui.showAll; save(); updateModeButtons(); markAllDirty(); renderPane(S.ui.store); }
+  if (e.target.closest('.mode')) { S.ui.showAll = !S.ui.showAll; save(); updateModeButtons(); markAllDirty(); renderPane(S.ui.store); return; }
+  if (e.target.closest('.clear')) {
+    const sid = e.target.closest('.pane').dataset.sid; const n = lineCount(sid); const st = storeById(sid);
+    if (!n) { toast('Nothing on this order for ' + esc(st.short)); return; }
+    const cases = Object.values(S.orders.current[sid] || {}).reduce((a, b) => a + b, 0);
+    confirmSheet({ title: `Clear ${st.short}'s order?`, body: `Removes <b>${n} line${n === 1 ? '' : 's'}, ${cases} cases</b> from this order for ${esc(st.name)}. Last order stays. You can undo right after.`, okLabel: 'Clear store', danger: true, onOk: () => clearStoreOrder(sid) });
+  }
 });
 
 // --- sheet swipe + row swipe (pointer events; track has touch-action: pan-y so vertical scroll stays native)
@@ -669,8 +689,8 @@ let drag = null;
 track.addEventListener('pointerdown', e => {
   if (e.pointerType === 'mouse' && e.button !== 0) return;
   drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lastX: e.clientX, lastT: performance.now(), vx: 0, mode: null, rw: null };
-  const qc = e.target.closest('.qc'), rw = e.target.closest('.rw');
-  if (qc && rw && rw.querySelector('.row').classList.contains('on')) drag.rw = rw;
+  const rw = e.target.closest('.rw');
+  if (rw && rw.querySelector('.row').classList.contains('on')) drag.rw = rw;
 });
 track.addEventListener('pointermove', e => {
   if (!drag || e.pointerId !== drag.id) return;
@@ -678,7 +698,7 @@ track.addEventListener('pointermove', e => {
   if (!drag.mode) {
     if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
     if (Math.abs(dy) > Math.abs(dx)) { drag = null; return; }   // vertical: leave it to native scroll
-    drag.mode = drag.rw ? 'row' : 'sheet';
+    drag.mode = (drag.rw && dx < 0) ? 'row' : 'sheet';   // left on an on-order row = clear it; anything else = switch store
     try { track.setPointerCapture(e.pointerId); } catch (err) {}
     if (drag.mode === 'sheet') track.style.transition = 'none';
     else { drag.rw.classList.add('swiping'); drag.rw.querySelector('.row').style.transition = 'none'; }
@@ -786,9 +806,9 @@ function renderMaster() {
   $('#master-sub').textContent = 'this order · all stores';
   const stores = new Set(); rows.forEach(r => r.by.forEach(([sid]) => stores.add(sid)));
   $('#master-hero').innerHTML = `<div class="main"><div class="v">${cases}</div><div class="l">cases to key into OTS</div></div><div class="side"><b>${rows.length}</b>products<div class="bar">${S.stores.map(s => `<i class="${stores.has(s.id) ? 'on' : ''}" style="--c:${s.color}"></i>`).join('')}</div>${stores.size} of ${S.stores.length} stores</div>`;
-  $('#mrows').innerHTML = rows.length ? rows.map(r => `<div class="mrow"><div class="body"><div class="name">${esc(r.product.name)}</div><div class="item">${r.product.item ? esc(r.product.item) : '<i>no item #</i>'}</div><div class="by">${r.by.map(([sid, q]) => { const s = storeById(sid); return `<span style="--c:${s ? s.color : '#888'}">${esc(s ? s.short : sid)}<b>${q}</b></span>`; }).join('')}</div></div><div class="tot">${r.total}</div></div>`).join('')
+  $('#mrows').innerHTML = rows.length ? rows.map(r => `<div class="mrw" data-pid="${r.product.id}"><div class="under">Remove</div><div class="mrow"><div class="body"><div class="name">${esc(r.product.name)}</div><div class="item">${r.product.item ? esc(r.product.item) : '<i>no item #</i>'}</div><div class="by">${r.by.map(([sid, q]) => { const s = storeById(sid); return `<span style="--c:${s ? s.color : '#888'}">${esc(s ? s.short : sid)}<b>${q}</b></span>`; }).join('')}</div></div><div class="tot">${r.total}</div></div></div>`).join('') + '<div class="swipe-hint">Swipe a row left to drop it from every store</div>'
     : `<div class="empty"><div class="ico"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><br>Nothing on this order yet.<br>Add items on the <b>Stores</b> tab and the totals across all ${S.stores.length} stores show up here.<br><span style="color:var(--dim2);font-size:12.5px">Last order's numbers are never counted here.</span></div>`;
-  $('#btn-step').disabled = !rows.length; $('#btn-copyall').disabled = !rows.length;
+  $('#btn-step').disabled = !rows.length; $('#btn-copyall').disabled = !rows.length; $('#btn-clearall').disabled = !rows.length;
 }
 function masterText() {
   return masterRows().map(r => `${r.product.item || '(no item #)'}\t${r.total}\t${r.product.name}`).join('\n');
@@ -801,6 +821,62 @@ $('#btn-copyall').addEventListener('click', async () => {
   const ok = await copyText(masterText()); vib();
   toast(ok ? 'Copied the whole master list' : 'Copy failed — try the step-through');
 });
+function snapshotCurrent() { return clone(S.orders.current); }
+function restoreCurrent(snap) { S.orders.current = clone(snap); save(); markAllDirty(); renderChips(); renderPane(S.ui.store); if (!views.master.hidden) renderMaster(); }
+function clearAllOrder() {
+  const snap = snapshotCurrent(); const n = masterRows().length;
+  S.orders.current = {}; save(); vib(); markAllDirty(); renderChips(); renderPane(S.ui.store); renderMaster();
+  toast(`Cleared this order — ${n} product${n === 1 ? '' : 's'} across all stores`, 'Undo', () => restoreCurrent(snap), 8000);
+}
+function clearStoreOrder(sid) {
+  const snap = snapshotCurrent(); const n = lineCount(sid); const st = storeById(sid);
+  delete S.orders.current[sid]; save(); vib(); markAllDirty(); renderChips(); renderPane(sid);
+  toast(`Cleared ${esc(st ? st.short : '')} — ${n} line${n === 1 ? '' : 's'}`, 'Undo', () => restoreCurrent(snap), 8000);
+}
+function removeProductEverywhere(pid) {
+  const snap = snapshotCurrent(); const p = productMap().get(pid); let total = 0;
+  for (const sid in S.orders.current) { total += S.orders.current[sid][pid] || 0; delete S.orders.current[sid][pid]; }
+  save(); vib(); markAllDirty(); renderChips(); renderPane(S.ui.store); renderMaster();
+  toast(`Removed ${esc(p ? p.name : '')} (${total}) from every store`, 'Undo', () => restoreCurrent(snap), 8000);
+}
+$('#btn-clearall').addEventListener('click', () => {
+  const rows = masterRows(); if (!rows.length) return;
+  const cases = rows.reduce((a, r) => a + r.total, 0);
+  confirmSheet({ title: 'Clear this order?', body: `Removes <b>${rows.length} products, ${cases} cases</b> from this order on every store. Last order's numbers are not touched. You can undo right after.`, okLabel: 'Clear order', danger: true, onOk: clearAllOrder });
+});
+// swipe a master row left to drop that product from every store
+{
+  const mr = $('#mrows'); let d = null;
+  mr.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const w = e.target.closest('.mrw'); if (!w) return;
+    d = { id: e.pointerId, x: e.clientX, y: e.clientY, w, mode: null };
+  });
+  mr.addEventListener('pointermove', e => {
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.mode) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      if (Math.abs(dy) > Math.abs(dx) || dx > 0) { d = null; return; }
+      d.mode = 'row'; try { mr.setPointerCapture(e.pointerId); } catch (err) {}
+      d.w.classList.add('swiping'); d.w.querySelector('.mrow').style.transition = 'none';
+    }
+    d.w.querySelector('.mrow').style.transform = `translateX(${Math.min(0, dx)}px)`;
+  });
+  const end = e => {
+    if (!d || e.pointerId !== d.id) return;
+    const dd = d; d = null; if (!dd.mode) return;
+    const row = dd.w.querySelector('.mrow'); const dx = e.clientX - dd.x;
+    if (e.type !== 'pointercancel' && dx < -90) {
+      row.style.transition = RM ? 'none' : 'transform 160ms ease-out'; row.style.transform = `translateX(${-mr.clientWidth}px)`;
+      setTimeout(() => removeProductEverywhere(dd.w.dataset.pid), RM ? 0 : 160);
+    } else {
+      row.style.transition = RM ? 'none' : 'transform 200ms cubic-bezier(.2,.7,.2,1)'; row.style.transform = '';
+      setTimeout(() => { row.style.transition = ''; dd.w.classList.remove('swiping'); }, 220);
+    }
+  };
+  mr.addEventListener('pointerup', end); mr.addEventListener('pointercancel', end);
+}
 // pull-to-refresh (touch events so we can claim the drag only when the list is at the top)
 {
   const ml = $('#mlist'), ptr = $('#ptr'); let sy = null, pulled = 0;
