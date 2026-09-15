@@ -21,6 +21,15 @@ step, no bundler, no CDN, no webfonts. All data in `localStorage` under
 6. **Bold / accent = the latest (current) order.** Dim = the order already
    placed. Any doc that says otherwise is wrong.
 
+## Visual direction (user's call, 2026-09-15)
+
+Bold & colorful on black, Cash-App style: flat saturated blocks, huge numerals,
+900-weight type, pill buttons. **Each store has its own color** (`store.color`,
+picked in Setup) that floods that store's header, chip, "this order" capsule, the
+composer send button, and its pill in the master list. Neutral white = primary
+action, green `--go` = "cases"/go, amber `--warn` = next cutoff. This supersedes the
+original "one accent color" line in the spec — the user asked for it.
+
 ## UX invariants
 
 - The quick-add `<input>` is never re-created or re-rendered — only the list
