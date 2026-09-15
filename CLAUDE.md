@@ -3,7 +3,8 @@
 Phone-only PWA for a DSD snack delivery route. Vanilla HTML/CSS/JS in a single
 `index.html` + `sw.js` + `manifest.webmanifest` + icons. No framework, no build
 step, no bundler, no CDN, no webfonts. All data in `localStorage` under
-`snackroute.v1`. Nothing leaves the phone.
+`snackroute.v1` (source of truth, works offline). Optional cloud sync mirrors it
+to Firestore — see below.
 
 ## Hard rules (do not break)
 
@@ -74,6 +75,20 @@ Offsets are probed with `Intl.DateTimeFormat`, never hardcoded.
 
 Cache-first, app shell precached. **Bump `CACHE` in `sw.js` whenever any file
 changes.**
+
+## Cloud sync (optional, user-enabled)
+
+Firebase project `snack-route-jt` (user's account, free plan; `firebase` CLI is
+logged in on this Mac). No SDK — plain `fetch` to the Firestore REST API. The
+whole state is one document: `routes/{syncKey}/state/main` with fields `json`,
+`updatedAt`, `device`. The sync key is a 48-char random secret generated on the
+phone (`snackroute.sync` in localStorage, *not* inside the synced state); rules in
+`firestore.rules` allow read/write only under a 40–80 char key, never list, never
+delete. Deploy rules with `firebase deploy --only firestore:rules`.
+Model: local-first; `save()` bumps `localAt` and debounces a push; boot / online /
+foreground pull; newest `updatedAt` wins. `saveUI()` is for tab/store/view
+toggles and does not count as a data change. `?join=KEY` opens the join sheet.
+The web API key in `FB` is public by design; the rules are the protection.
 
 ## Hosting
 

@@ -31,5 +31,7 @@ Open http://localhost:8787 in Chrome.
 
 ## Data
 
-Everything is in `localStorage` under `snackroute.v1`. Setup → Backup exports
-and imports a JSON file. There is no server and no sync.
+Everything is in `localStorage` under `snackroute.v1` and works offline. Setup →
+Backup exports/imports a JSON file. Setup → Cloud sync (optional) mirrors the
+data to Firestore (project `snack-route-jt`, rules in `firestore.rules`) under a
+private sync key so it can be opened on another device via a `?join=KEY` link.

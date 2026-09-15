@@ -318,6 +318,10 @@ body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 2px)}
 .horder .tot{font-size:20px;font-weight:900;letter-spacing:-.03em}
 .hlines .li .name{font-weight:700}
 .hlines .li .q{font-size:18px;font-weight:900;min-width:36px;text-align:right}
+.keybox{margin-top:12px;background:var(--bg);border-radius:12px;padding:10px 12px;overflow-x:auto;scrollbar-width:none}
+.keybox code{font-size:12.5px;letter-spacing:.04em;white-space:nowrap;color:var(--dim)}
+.sdot{width:12px;height:12px;border-radius:50%;flex:none;background:var(--dim2)}
+.sdot.ok{background:var(--go)}.sdot.busy{background:var(--warn)}.sdot.warn{background:var(--danger)}
 /* ---------- setup ---------- */
 .sec{padding:20px 8px 8px;font-size:13px;color:var(--text);letter-spacing:-.01em;font-weight:900;display:flex;justify-content:space-between;align-items:center}
 .sec span{color:var(--dim);font-weight:700;font-size:12px}
@@ -667,7 +671,12 @@ function load() {
   try { const raw = localStorage.getItem(LS_KEY); if (raw) { S = migrate(JSON.parse(raw)); if (S.catalogVersion === CATALOG_VERSION) return; } } catch (e) {}
   S = seed(); save();   // fresh (or catalog reset): stores, full catalog, empty orders
 }
-function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { toast('Could not save — is storage full?'); } }
+let applyingRemote = true;   // true while booting / applying a cloud copy: saves then don't count as local edits
+function save(fromRemote) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { toast('Could not save — is storage full?'); }
+  if (!fromRemote && !applyingRemote) { SYNC.localAt = Date.now(); saveSyncMeta(); scheduleSync(); }
+}
+const saveUI = () => save(true);   // tab / store / view toggles: persisted, but not a data change worth syncing
 const productMap = () => new Map(S.products.map(p => [p.id, p]));
 const storeById = id => S.stores.find(s => s.id === id);
 const getQ = (kind, sid, pid) => (S.orders[kind][sid] || {})[pid] || 0;
@@ -728,6 +737,86 @@ function candidates(raw) {
   return [...map.values()].sort((a, b) => b.score - a.score || a.product.name.localeCompare(b.product.name));
 }
 
+// ===================== cloud sync (Firestore REST, no SDK) =====================
+// Local storage is the source of truth and works offline. When a sync key is set, every
+// save() queues a push of the whole state to Firestore; opening the app (or coming back
+// online / to the foreground) pulls, newest timestamp wins.
+const FB = { project: 'snack-route-jt', apiKey: 'AIzaSyCV-jlDF0VvYss2AZcGkf_h7g-SOqIxVUk' };
+const SYNC_KEY = 'snackroute.sync';
+let SYNC = { key: '', device: '', localAt: 0, syncedAt: 0, lastOk: 0, error: '' };
+try { Object.assign(SYNC, JSON.parse(localStorage.getItem(SYNC_KEY) || '{}')); } catch (e) {}
+if (!SYNC.device) { SYNC.device = Math.random().toString(36).slice(2, 10); }
+function saveSyncMeta() { try { localStorage.setItem(SYNC_KEY, JSON.stringify(SYNC)); } catch (e) {} }
+const syncOn = () => !!SYNC.key;
+const docUrl = () => `https://firestore.googleapis.com/v1/projects/${FB.project}/databases/(default)/documents/routes/${encodeURIComponent(SYNC.key)}/state/main?key=${FB.apiKey}`;
+function newSyncKey() { const b = new Uint8Array(36); crypto.getRandomValues(b); return btoa(String.fromCharCode(...b)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+let syncTimer = null, syncBusy = false, syncAgain = false;
+function scheduleSync() { if (!syncOn()) return; clearTimeout(syncTimer); syncTimer = setTimeout(() => pushState(), 1500); }
+async function pushState() {
+  if (!syncOn() || !navigator.onLine) return false;
+  if (syncBusy) { syncAgain = true; return false; }
+  syncBusy = true;
+  try {
+    const at = SYNC.localAt || Date.now();
+    const body = { fields: { json: { stringValue: JSON.stringify(S) }, updatedAt: { integerValue: String(at) }, device: { stringValue: SYNC.device } } };
+    const r = await fetch(docUrl(), { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    SYNC.syncedAt = at; SYNC.lastOk = Date.now(); SYNC.error = ''; saveSyncMeta(); renderSyncStatus();
+    return true;
+  } catch (e) { SYNC.error = String(e.message || e); saveSyncMeta(); renderSyncStatus(); return false; }
+  finally { syncBusy = false; if (syncAgain) { syncAgain = false; scheduleSync(); } }
+}
+async function pullState(opts) {
+  opts = opts || {};
+  if (!syncOn() || !navigator.onLine) return 'offline';
+  let r;
+  try { r = await fetch(docUrl(), { cache: 'no-store' }); } catch (e) { SYNC.error = 'offline'; renderSyncStatus(); return 'offline'; }
+  if (r.status === 404) { if (opts.pushIfMissing !== false) await pushState(); return 'empty'; }
+  if (!r.ok) { SYNC.error = 'HTTP ' + r.status; saveSyncMeta(); renderSyncStatus(); return 'error'; }
+  const d = await r.json();
+  const remoteAt = Number((d.fields && d.fields.updatedAt && (d.fields.updatedAt.integerValue || d.fields.updatedAt.doubleValue)) || 0);
+  const json = d.fields && d.fields.json && d.fields.json.stringValue;
+  const dirty = SYNC.localAt > SYNC.syncedAt;
+  if (json && (opts.force || remoteAt > SYNC.localAt || (!dirty && remoteAt > SYNC.syncedAt))) {
+    try {
+      const inc = migrate(JSON.parse(json));
+      applyingRemote = true;
+      try { S = inc; save(true); renderAll(); showView(S.ui.tab); } finally { applyingRemote = false; }
+      SYNC.localAt = remoteAt; SYNC.syncedAt = remoteAt; SYNC.lastOk = Date.now(); SYNC.error = ''; saveSyncMeta();
+      renderSyncStatus();
+      if (!opts.quiet) toast('Updated from the cloud');
+      return 'pulled';
+    } catch (e) { SYNC.error = 'bad cloud data'; saveSyncMeta(); renderSyncStatus(); return 'error'; }
+  }
+  if (dirty) await pushState(); else { SYNC.lastOk = Date.now(); SYNC.error = ''; saveSyncMeta(); renderSyncStatus(); }
+  return 'same';
+}
+function syncStatusText() {
+  if (!syncOn()) return 'Off';
+  if (!navigator.onLine) return 'Offline — will sync when back online';
+  if (SYNC.error) return 'Problem: ' + SYNC.error;
+  if (SYNC.localAt > SYNC.syncedAt) return 'Saving to cloud…';
+  return SYNC.lastOk ? 'Synced ' + ago(SYNC.lastOk) : 'On';
+}
+function ago(t) { const s = Math.max(0, Math.round((Date.now() - t) / 1000)); if (s < 5) return 'just now'; if (s < 60) return s + 's ago'; const m = Math.round(s / 60); if (m < 60) return m + ' min ago'; const h = Math.round(m / 60); if (h < 48) return h + ' h ago'; return Math.round(h / 24) + ' days ago'; }
+function renderSyncStatus() { const el = $('#sync-status'); if (el) el.textContent = syncStatusText(); const dot = $('#sync-dot'); if (dot) dot.className = 'sdot ' + (!syncOn() ? 'off' : SYNC.error || !navigator.onLine ? 'warn' : SYNC.localAt > SYNC.syncedAt ? 'busy' : 'ok'); }
+window.addEventListener('online', () => { renderSyncStatus(); pullState({ quiet: true }); });
+window.addEventListener('offline', renderSyncStatus);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullState({ quiet: true }); });
+async function enableSync(key, mode) {   // mode: 'new' | 'join'
+  SYNC.key = key; SYNC.syncedAt = 0; SYNC.error = ''; saveSyncMeta();
+  if (mode === 'new') { SYNC.localAt = Date.now(); saveSyncMeta(); const ok = await pushState(); toast(ok ? 'Cloud sync is on' : 'Sync key saved — will upload when online'); }
+  else {
+    const res = await pullState({ force: true, pushIfMissing: false });
+    if (res === 'empty') { SYNC.localAt = Date.now(); saveSyncMeta(); await pushState(); toast('Nothing in the cloud for that key yet — uploaded this phone\'s data'); }
+    else if (res === 'pulled') toast('Joined — data pulled from the cloud');
+    else if (res === 'offline') toast('Key saved — will pull when online');
+    else toast('Could not reach the cloud: ' + (SYNC.error || res));
+  }
+  renderSetup();
+}
+function disableSync() { SYNC.key = ''; SYNC.syncedAt = 0; SYNC.error = ''; saveSyncMeta(); renderSetup(); toast('Cloud sync is off — data stays on this phone'); }
+
 // ===================== toast / undo =====================
 const toastEl = $('#toast'), toastMsg = $('#toast-msg'), toastBtn = $('#toast-btn');
 let toastTimer = null, toastAction = null;
@@ -757,12 +846,13 @@ function showView(name) {
   $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   qaForm.hidden = name !== 'stores';
   document.body.classList.toggle('has-qa', name === 'stores');
-  S.ui.tab = name; save();
+  S.ui.tab = name; saveUI();
   if (name === 'stores') { layoutTrack(false); renderPaneIfDirty(S.ui.store); }
   if (name === 'master') renderMaster();
   if (name === 'cutoffs') renderCutoffs();
   if (name === 'history') renderHistory();
   if (name === 'setup') renderSetup();
+  clearInterval(syncStatusTimer); syncStatusTimer = name === 'setup' ? setInterval(renderSyncStatus, 5000) : null;
   startTick(name === 'cutoffs');
 }
 $('#tabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (t) showView(t.dataset.tab); });
@@ -885,12 +975,12 @@ function clearRow(sid, pid) {
 track.addEventListener('click', e => {
   const st = e.target.closest('.st');
   if (st) { const rw = st.closest('.rw'), pane = st.closest('.pane'); step(pane.dataset.sid, rw.dataset.pid, +st.dataset.d); return; }
-  if (e.target.closest('.mode')) { S.ui.showAll = !S.ui.showAll; save(); updateModeButtons(); markAllDirty(); renderPane(S.ui.store); return; }
+  if (e.target.closest('.mode')) { S.ui.showAll = !S.ui.showAll; saveUI(); updateModeButtons(); markAllDirty(); renderPane(S.ui.store); return; }
   const cat = e.target.closest('.cat');
   if (cat) {
     const c = cat.dataset.cat; const closed = !S.ui.collapsed[c];
     if (closed) S.ui.collapsed[c] = true; else delete S.ui.collapsed[c];
-    save(); vib();
+    saveUI(); vib();
     cat.classList.toggle('closed', closed); cat.setAttribute('aria-expanded', String(!closed));
     cat.nextElementSibling.hidden = closed;
     S.stores.forEach(st => { if (st.id !== S.ui.store) dirty.add(st.id); });   // other panes pick it up when shown
@@ -898,7 +988,7 @@ track.addEventListener('click', e => {
   }
   if (e.target.closest('.lg.last')) {
     if (S.ui.prevDepth === 1 && S.history.length < 2) { toast('No older order yet — the one-before-last shows up here after two rollovers'); return; }
-    S.ui.prevDepth = S.ui.prevDepth === 1 ? 2 : 1; save(); vib(); markAllDirty(); renderPane(S.ui.store);
+    S.ui.prevDepth = S.ui.prevDepth === 1 ? 2 : 1; saveUI(); vib(); markAllDirty(); renderPane(S.ui.store);
     toast(S.ui.prevDepth === 2 ? 'Showing the order before last in the grey tiles' : 'Back to last order');
     return;
   }
@@ -918,7 +1008,7 @@ function layoutTrack(animate) {
 }
 function goTo(i, animate) {
   i = Math.max(0, Math.min(S.stores.length - 1, i));
-  idx = i; S.ui.store = S.stores[i].id; save();
+  idx = i; S.ui.store = S.stores[i].id; saveUI();
   layoutTrack(animate);
   renderPaneIfDirty(S.ui.store);
   if (i > 0) renderPaneIfDirty(S.stores[i - 1].id);
@@ -1270,7 +1360,7 @@ function cycles(now) {
   list.sort((a, b) => a.at - b.at);
   return list;
 }
-let tick = null;
+let tick = null, syncStatusTimer = null;
 function startTick(on) { clearInterval(tick); tick = null; if (on) tick = setInterval(tickCutoffs, 1000); }
 function tickCutoffs() {
   const now = new Date();
@@ -1371,7 +1461,7 @@ function renderHistory() {
   $('#history').innerHTML = html;
 }
 let histAll = false;
-$('#hist-chips').addEventListener('click', e => { const c = e.target.closest('[data-h]'); if (!c) return; S.ui.histStore = c.dataset.h; save(); histAll = false; renderHistory(); });
+$('#hist-chips').addEventListener('click', e => { const c = e.target.closest('[data-h]'); if (!c) return; S.ui.histStore = c.dataset.h; saveUI(); histAll = false; renderHistory(); });
 $('#history').addEventListener('click', e => {
   if (e.target.closest('#hist-more')) { histAll = !histAll; renderHistory(); return; }
   const o = e.target.closest('.horder'); if (!o) return;
@@ -1401,6 +1491,15 @@ function renderSetup() {
 <div class="stack"><button type="button" class="btn primary" id="btn-addprod"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add product</button><button type="button" class="btn" id="btn-bulk"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Bulk paste</button></div>
 <div class="search"><input type="search" id="setup-q" placeholder="Filter products…" value="${esc(setupFilter)}" autocomplete="off"></div>
 <div id="plist" class="setup-group">${plistHTML(shown)}</div>
+<div class="sec">Cloud sync <span id="sync-status">${syncStatusText()}</span></div>
+<div class="setup-group" style="padding:14px 16px">
+${syncOn() ? `<div style="display:flex;align-items:center;gap:10px"><span id="sync-dot" class="sdot"></span><div style="flex:1;min-width:0;font-size:13.5px;color:var(--dim);font-weight:600;line-height:1.45">Every change is saved here and to the cloud. Open <b style="color:var(--text)">jthorson0.github.io/snack-route</b> on another device and join with this key.</div></div>
+<div class="keybox"><code id="sync-key">${esc(SYNC.key)}</code></div>
+<div class="stack" style="padding:10px 0 0"><button type="button" class="btn" id="btn-copykey"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy key</button><button type="button" class="btn" id="btn-sharelink"><svg viewBox="0 0 24 24"><path d="M12 3v13M7 8l5-5 5 5M5 14v6h14v-6"/></svg>Share join link</button></div>
+<div class="stack" style="padding:8px 0 0"><button type="button" class="btn" id="btn-syncnow">Sync now</button><button type="button" class="btn ghost" id="btn-syncoff">Turn off</button></div>`
+: `<div style="font-size:13.5px;color:var(--dim);font-weight:600;line-height:1.45">Keeps a live copy in the cloud (Firestore) so a lost phone loses nothing, and lets you open the same data on your computer. Data still saves on this phone first and works offline.</div>
+<div class="stack" style="padding:12px 0 0"><button type="button" class="btn primary" id="btn-syncnew">Turn on sync</button><button type="button" class="btn" id="btn-syncjoin">Join with a key</button></div>`}
+</div>
 <div class="sec">Backup</div>
 <div class="stack"><button type="button" class="btn primary" id="btn-share"><svg viewBox="0 0 24 24"><path d="M12 3v13M7 8l5-5 5 5M5 14v6h14v-6"/></svg>Share backup</button><button type="button" class="btn" id="btn-export"><svg viewBox="0 0 24 24"><path d="M12 3v12M6 9l6 6 6-6M4 21h16"/></svg>Download</button><button type="button" class="btn" id="btn-copyjson">Copy JSON</button></div>
 <div class="note">Everything saves to this phone instantly on every tap. Share a backup to Drive or email now and then so a lost phone doesn't mean a lost catalog. The backup includes order history.</div>
@@ -1408,6 +1507,7 @@ function renderSetup() {
 <div class="note">There's no sync between phones — move data with a backup file (Import above).</div>
 <div class="sec">Danger zone</div>
 <div class="stack"><button type="button" class="btn ghost" id="btn-reset">Reset to the starter catalog…</button></div>`;
+  renderSyncStatus();
 }
 let setupFilter = '';
 const CHEV = '<span class="chev"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>';
@@ -1439,6 +1539,12 @@ setupEl.addEventListener('click', e => {
   if (e.target.closest('#btn-bulk')) { openBulk(); return; }
   if (e.target.closest('#btn-export')) { exportBackup(); return; }
   if (e.target.closest('#btn-share')) { shareBackup(); return; }
+  if (e.target.closest('#btn-syncnew')) { confirmSheet({ title: 'Turn on cloud sync?', body: 'This phone gets a new sync key and uploads its data to the cloud. Anyone with the key can see and change this route\'s orders, so treat it like a password.', okLabel: 'Turn on', onOk: () => enableSync(newSyncKey(), 'new') }); return; }
+  if (e.target.closest('#btn-syncjoin')) { openJoinSheet(); return; }
+  if (e.target.closest('#btn-copykey')) { copyText(SYNC.key).then(ok => toast(ok ? 'Sync key copied' : 'Copy failed')); return; }
+  if (e.target.closest('#btn-sharelink')) { const url = location.origin + location.pathname + '?join=' + SYNC.key; (navigator.share ? navigator.share({ title: 'Snack Route', text: 'Open this on the other device to sync Snack Route', url }).catch(() => {}) : copyText(url).then(ok => toast(ok ? 'Join link copied' : 'Copy failed'))); return; }
+  if (e.target.closest('#btn-syncnow')) { pullState().then(r => { if (r === 'same') toast('Everything is in sync'); }); return; }
+  if (e.target.closest('#btn-syncoff')) { confirmSheet({ title: 'Turn off cloud sync?', body: 'Data stays on this phone. The cloud copy is left as-is and you can rejoin with the same key later.', okLabel: 'Turn off', danger: true, onOk: disableSync }); return; }
   if (e.target.closest('#btn-copyjson')) { copyText(backupJSON()).then(ok => toast(ok ? 'Backup JSON copied' : 'Copy failed')); return; }
   if (e.target.closest('#btn-pastejson')) { openPasteImport(); return; }
   if (e.target.closest('#btn-reset')) {
@@ -1538,6 +1644,11 @@ function importJSON(text) {
   const cases = Object.values(inc.orders.current).reduce((a, st) => a + Object.values(st).reduce((x, y) => x + y, 0), 0);
   confirmSheet({ title: 'Replace everything with this backup?', body: `The backup has <b>${inc.products.length} products</b>, ${inc.stores.length} stores and ${cases} cases on its current order${obj.exportedAt ? ' (exported ' + esc(obj.exportedAt.slice(0, 10)) + ')' : ''}. Your data on this phone is replaced.`, okLabel: 'Import', danger: true, onOk: () => { S = inc; save(); renderAll(); toast('Backup imported'); } });
 }
+function openJoinSheet(prefill) {
+  const sh = openSheet({ title: 'Join with a sync key', sub: 'Paste the key from your other device', html: `<label class="fld"><span>Sync key</span><input id="join-key" value="${esc(prefill || '')}" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="40+ characters"></label><div class="help" style="font-size:12.5px;color:var(--dim2);line-height:1.45">If the cloud already has data for this key, it replaces what's on this phone. If it's empty, this phone's data is uploaded.</div><div class="btnrow"><button type="button" class="btn primary" id="join-go">Join</button></div>` });
+  $('#join-go', sh.el).addEventListener('click', () => { const k = $('#join-key', sh.el).value.trim(); if (!/^[A-Za-z0-9_-]{40,80}$/.test(k)) { toast('That does not look like a sync key'); return; } sh.close(); enableSync(k, 'join'); });
+  setTimeout(() => $('#join-key', sh.el).focus(), 50);
+}
 function openPasteImport() {
   const sh = openSheet({ title: 'Paste a backup', html: `<label class="fld"><span>Backup JSON</span><textarea id="paste-t" autocapitalize="none" spellcheck="false"></textarea></label><div class="btnrow"><button type="button" class="btn primary" id="paste-go">Import</button></div>` });
   $('#paste-go', sh.el).addEventListener('click', () => { const t = $('#paste-t', sh.el).value; sh.close(); importJSON(t); });
@@ -1576,6 +1687,12 @@ if (new URLSearchParams(location.search).has('demo')) {
 }
 renderAll();
 showView(S.ui.tab);
+applyingRemote = false;
+{
+  const join = new URLSearchParams(location.search).get('join');
+  if (join) { history.replaceState(null, '', location.pathname); if (join !== SYNC.key) { showView('setup'); openJoinSheet(join); } }
+  else if (syncOn()) pullState({ quiet: true });
+}
 
 // update-ready notice (the SW takes over on next load; nothing here blocks anything)
 if ('serviceWorker' in navigator) navigator.serviceWorker.ready.then(reg => {

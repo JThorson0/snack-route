@@ -1,0 +1,19 @@
+rules_version = '2';
+// Snack Route sync. Data lives at routes/{key}/state/main. The key is a long
+// random secret generated on the phone; anyone holding it can read/write that
+// route's data (like a private link). Nothing else is readable.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function validKey(k) { return k.size() >= 40 && k.size() <= 80 && k.matches('^[A-Za-z0-9_-]+$'); }
+    match /routes/{key}/state/{doc} {
+      allow read: if validKey(key);
+      allow create, update: if validKey(key)
+        && request.resource.data.keys().hasOnly(['json', 'updatedAt', 'device'])
+        && request.resource.data.json is string
+        && request.resource.data.json.size() < 900000
+        && request.resource.data.updatedAt is number;
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
