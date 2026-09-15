@@ -78,8 +78,16 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stro
 .pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;position:relative;padding:0 0 16px;display:flex;flex-direction:column}
 .pane .list{flex:1}
 .group{margin:0 0 6px}
-.cat{position:sticky;top:0;z-index:1;background:var(--bg);padding:14px 20px 8px;font-size:13px;font-weight:900;color:var(--text);letter-spacing:-.01em}
-.cat::after{content:"";display:block;width:28px;height:3px;border-radius:2px;background:var(--sc);margin-top:6px}
+.cat{position:sticky;top:0;z-index:1;background:var(--bg);width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 20px;min-height:52px;text-align:left;font-size:14px;font-weight:900;color:var(--text);letter-spacing:-.01em}
+.cat::before{content:"";width:4px;height:22px;border-radius:2px;background:var(--sc);flex:none;margin-left:-8px}
+.cat .cn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat .cnt{font-size:12px;font-weight:700;color:var(--dim);white-space:nowrap}
+.cat .cnt b{color:var(--ink);background:var(--sc);border-radius:8px;padding:2px 7px;margin-right:6px;font-weight:900}
+.cat .chev{width:32px;height:32px;border-radius:10px;background:var(--surface);display:inline-flex;align-items:center;justify-content:center;flex:none;transition:transform 160ms}
+.cat .chev svg{width:16px;height:16px;stroke:var(--dim);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.cat.closed .chev{transform:rotate(-90deg)}
+.cat:active{background:var(--surface)}
+.group[hidden]{display:none}
 .rw{position:relative;overflow:hidden}
 .rw + .rw .row::before{content:"";position:absolute;left:20px;right:0;top:0;height:1px;background:var(--line)}
 .rw .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;
@@ -450,7 +458,8 @@ function migrate(o) {
   o.submitted = o.submitted && typeof o.submitted === 'object' ? o.submitted : {};
   o.rolloverBackup = o.rolloverBackup || null;
   o.lastRollover = o.lastRollover || null;
-  o.ui = Object.assign({ store: o.stores[0].id, showAll: false, tab: 'stores' }, o.ui || {});
+  o.ui = Object.assign({ store: o.stores[0].id, showAll: false, tab: 'stores', collapsed: {} }, o.ui || {});
+  if (!o.ui.collapsed || typeof o.ui.collapsed !== 'object') o.ui.collapsed = {};
   if (!o.stores.some(s => s.id === o.ui.store)) o.ui.store = o.stores[0].id;
   return o;
 }
@@ -601,7 +610,11 @@ function renderPane(sid) {
   if (S.ui.showAll) {
     const groups = new Map();
     for (const p of S.products) { const c = p.category || 'Uncategorized'; if (!groups.has(c)) groups.set(c, []); groups.get(c).push(p); }
-    for (const [c, ps] of groups) { html += `<div class="cat">${esc(c)}</div><div class="group">`; for (const p of ps) html += rowHTML(p, prev[p.id] || 0, cur[p.id] || 0); html += '</div>'; }
+    for (const [c, ps] of groups) {
+      const closed = !!S.ui.collapsed[c]; const on = ps.filter(p => cur[p.id] > 0).length;
+      html += `<button type="button" class="cat${closed ? ' closed' : ''}" data-cat="${esc(c)}" aria-expanded="${!closed}"><span class="cn">${esc(c)}</span><span class="cnt">${on ? `<b>${on}</b>` : ''}${ps.length}</span><span class="chev"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></button><div class="group" data-cat="${esc(c)}"${closed ? ' hidden' : ''}>`;
+      for (const p of ps) html += rowHTML(p, prev[p.id] || 0, cur[p.id] || 0); html += '</div>';
+    }
     if (!S.products.length) html = `<div class="empty">No products yet.<br>Add them in <b>Setup</b>, or just type a name below and tap <b>Create</b>.</div>`;
   } else {
     const byId = productMap(); const seen = new Set(); const ids = [];
@@ -628,11 +641,18 @@ function patchRow(sid, pid, reveal) {
   if (!rw || !visible) {
     renderPane(sid);
     rw = pane.querySelector(`.rw[data-pid="${pid}"]`);
+    if (rw && reveal) { const g = rw.closest('.group[data-cat]'); if (g && g.hidden) { g.hidden = false; g.previousElementSibling.classList.remove('closed'); delete S.ui.collapsed[g.dataset.cat]; save(); } }
     if (rw && reveal) { rw.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' }); rw.classList.add('flash'); setTimeout(() => rw.classList.remove('flash'), 650); }
     return;
   }
   rw.querySelector('.row').classList.toggle('on', cur > 0);
   updateSummary(sid);
+  const grp = rw.closest('.group[data-cat]');
+  if (grp) {
+    const head = grp.previousElementSibling; const on = grp.querySelectorAll('.row.on').length;
+    const cnt = head.querySelector('.cnt'); if (cnt) cnt.innerHTML = `${on ? `<b>${on}</b>` : ''}${grp.querySelectorAll('.rw').length}`;
+    if (reveal && grp.hidden) { grp.hidden = false; head.classList.remove('closed'); head.setAttribute('aria-expanded', 'true'); delete S.ui.collapsed[grp.dataset.cat]; save(); }
+  }
   const c = rw.querySelector('.cur'); c.textContent = cur;
   if (!RM) { c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); }
   if (reveal) rw.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' });
@@ -659,6 +679,16 @@ track.addEventListener('click', e => {
   const st = e.target.closest('.st');
   if (st) { const rw = st.closest('.rw'), pane = st.closest('.pane'); step(pane.dataset.sid, rw.dataset.pid, +st.dataset.d); return; }
   if (e.target.closest('.mode')) { S.ui.showAll = !S.ui.showAll; save(); updateModeButtons(); markAllDirty(); renderPane(S.ui.store); return; }
+  const cat = e.target.closest('.cat');
+  if (cat) {
+    const c = cat.dataset.cat; const closed = !S.ui.collapsed[c];
+    if (closed) S.ui.collapsed[c] = true; else delete S.ui.collapsed[c];
+    save(); vib();
+    cat.classList.toggle('closed', closed); cat.setAttribute('aria-expanded', String(!closed));
+    cat.nextElementSibling.hidden = closed;
+    S.stores.forEach(st => { if (st.id !== S.ui.store) dirty.add(st.id); });   // other panes pick it up when shown
+    return;
+  }
   if (e.target.closest('.clear')) {
     const sid = e.target.closest('.pane').dataset.sid; const n = lineCount(sid); const st = storeById(sid);
     if (!n) { toast('Nothing on this order for ' + esc(st.short)); return; }
