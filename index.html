@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
-  --bg:#0b0c0f;--surface:#15171c;--surface2:#1e2129;--surface3:#282c36;--line:#22252d;
-  --text:#e9ebf1;--dim:#8b92a1;--dim2:#555c6a;--accent:#f4b942;--accent-ink:#1a1200;--danger:#e5484d;
+  --bg:#0a0b0e;--surface:#13151a;--surface2:#1b1e25;--surface3:#262a33;--line:rgba(255,255,255,.065);
+  --text:#eef0f4;--dim:#8e95a3;--dim2:#5a6170;--accent:#f5b544;--accent-soft:rgba(245,181,68,.13);--accent-ink:#1a1200;--danger:#e5484d;
   --tabs-h:56px;--qa-h:100px;--sab:env(safe-area-inset-bottom,0px);--sat:env(safe-area-inset-top,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -34,77 +34,90 @@ b{font-weight:700}
 .hdr .sub{color:var(--dim);font-size:13px;white-space:nowrap}
 
 /* store chips */
-.chips{flex:none;display:flex;gap:6px;padding:calc(var(--sat) + 10px) 12px 8px;overflow-x:auto;scrollbar-width:none}
+.chips{flex:none;display:flex;gap:6px;padding:calc(var(--sat) + 10px) 12px 10px;overflow-x:auto;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;height:36px;padding:0 12px;border-radius:18px;background:var(--surface);color:var(--dim);
-  font-weight:600;font-size:14px;display:flex;align-items:center;gap:7px;border:1px solid transparent}
-.chip.active{color:var(--text);border-color:var(--accent);background:var(--surface2)}
-.chip .n{font-size:12px;color:var(--accent);font-weight:700}
+.chip{flex:none;height:36px;padding:0 13px;border-radius:18px;background:var(--surface2);color:var(--dim);
+  font-weight:600;font-size:14px;display:flex;align-items:center;gap:7px;transition:background 120ms,color 120ms}
+.chip:active{background:var(--surface3)}
+.chip.active{color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px rgba(245,181,68,.35)}
+.chip .n{font-size:11px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--surface3);color:var(--text);font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.chip.active .n{background:var(--accent);color:var(--accent-ink)}
+.stitle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px 8px;flex:none}
+.stitle h2{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stitle .sum{color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stitle .mode{height:32px;padding:0 10px 0 12px;border-radius:9px;background:var(--surface2);color:var(--dim);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px;flex:none}
+.stitle .mode svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2}
 
 /* store sheets */
 .track-wrap{flex:1;min-height:0;overflow:hidden;position:relative}
 .track{display:flex;height:100%;width:100%;touch-action:pan-y;will-change:transform}
 .pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;position:relative}
-.colhead{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;height:34px;padding:0 12px 0 16px;
-  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--dim2);border-bottom:1px solid var(--line)}
-.colhead .c-last{width:44px}
+.colhead{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;height:28px;padding:0 12px 0 16px;
+  font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim2);border-bottom:1px solid var(--line)}
+.colhead .c-last{width:52px}
 .colhead .c-prod{flex:1}
-.colhead .c-prod button{height:34px;color:var(--dim);letter-spacing:inherit;text-transform:inherit;font-weight:inherit;display:inline-flex;align-items:center;gap:4px}
-.colhead .c-prod button svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2}
-.colhead .c-now{width:140px;text-align:center;color:var(--accent)}
-.cat{position:sticky;top:34px;z-index:1;background:var(--bg);padding:14px 16px 6px;font-size:12px;font-weight:600;color:var(--dim);letter-spacing:.02em}
+.colhead .c-now{width:140px;text-align:center;color:var(--accent);opacity:.9}
+.cat{position:sticky;top:28px;z-index:1;background:var(--bg);padding:16px 16px 6px;font-size:11.5px;font-weight:700;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
 .rw{position:relative;overflow:hidden}
 .rw .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;
   background:var(--danger);color:#fff;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;opacity:0}
 .rw.swiping .under{opacity:1}
-.row{position:relative;display:flex;align-items:center;height:56px;padding:0 12px 0 16px;background:var(--bg);
-  border-bottom:1px solid var(--line);user-select:none;-webkit-user-select:none}
-.row .prev{width:44px;color:var(--dim);font-size:15px;font-weight:500}
-.row .prev .z{color:var(--dim2)}
-.row .body{flex:1;min-width:0;padding-right:8px}
-.row .name{font-weight:500;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row.on .name{color:var(--text)}
-.row .item{font-size:11.5px;color:var(--dim2);margin-top:2px;letter-spacing:.03em}
-.row .item .noitem{font-style:italic}
-.qc{display:flex;align-items:center;width:140px;flex:none;justify-content:space-between}
-.st{width:44px;height:44px;border-radius:12px;background:var(--surface);color:var(--dim);font-size:24px;font-weight:400;
-  display:flex;align-items:center;justify-content:center;line-height:1}
-.st:active{background:var(--surface3);color:var(--text)}
+.row{position:relative;display:flex;align-items:center;height:60px;padding:0 12px 0 16px;background:var(--bg);
+  user-select:none;-webkit-user-select:none}
+.row::after{content:"";position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line)}
+.row .prev{width:52px;flex:none;display:flex;align-items:center}
+.row .prev span{min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:var(--surface2);color:var(--dim);font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.row .body{flex:1;min-width:0;padding-right:10px}
+.row .name{font-size:15.5px;font-weight:500;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.005em}
+.row.on .name{color:var(--text);font-weight:600}
+.row .item{font-size:11.5px;color:var(--dim2);margin-top:3px;letter-spacing:.05em}
+.row .item .noitem{font-style:italic;letter-spacing:0}
+.qc{display:flex;align-items:center;width:140px;height:44px;flex:none;border-radius:13px;background:var(--surface);justify-content:space-between}
+.st{width:44px;height:44px;border-radius:13px;color:var(--dim);font-size:22px;font-weight:400;
+  display:flex;align-items:center;justify-content:center;line-height:1;transition:transform 80ms,background 80ms}
+.st:active{background:var(--surface3);color:var(--text);transform:scale(.92)}
 .cur{width:44px;text-align:center;font-size:19px;font-weight:700;color:var(--dim2)}
+.row.on .qc{background:var(--surface2)}
 .row.on .cur{color:var(--accent)}
 .cur.bump{animation:bump 170ms ease-out}
 @keyframes bump{0%{transform:scale(1.3)}100%{transform:scale(1)}}
 .rw.flash .row{animation:flash 600ms ease-out}
 @keyframes flash{0%{background:var(--surface2)}100%{background:var(--bg)}}
-.empty{padding:36px 24px;color:var(--dim);text-align:center;line-height:1.55;font-size:14px}
+.empty{padding:44px 28px;color:var(--dim);text-align:center;line-height:1.55;font-size:14px}
+.empty svg{width:40px;height:40px;stroke:var(--dim2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:14px}
 .empty b{color:var(--text)}
 .empty .link{display:inline-block;margin-top:14px;color:var(--accent);font-weight:600;height:44px;line-height:44px;padding:0 12px}
 
 /* quick add */
 .qa{flex:none;background:var(--surface);border-top:1px solid var(--line);padding:4px 12px 8px;height:var(--qa-h)}
+.qa-row{position:relative}
+.qa-row .plus{position:absolute;left:14px;top:0;height:48px;display:flex;align-items:center;color:var(--dim2);font-size:20px;pointer-events:none}
 .sugg{height:36px;display:flex;gap:6px;overflow-x:auto;align-items:center;scrollbar-width:none}
 .sugg::-webkit-scrollbar{display:none}
 .sugg .hint{color:var(--dim2);font-size:12.5px;white-space:nowrap}
 .sugg .hint kbd{background:var(--surface2);color:var(--dim)}
 .sugg .ok{color:var(--dim);font-size:13.5px;white-space:nowrap}
 .sugg .ok b{color:var(--accent)}
-.sg{flex:none;height:30px;padding:0 10px;border-radius:8px;background:var(--surface2);color:var(--text);font-size:13.5px;
-  display:flex;align-items:center;gap:6px;white-space:nowrap;font-weight:500}
+.sg{flex:none;height:30px;padding:0 6px 0 11px;border-radius:9px;background:var(--surface2);color:var(--text);font-size:13.5px;
+  display:flex;align-items:center;gap:7px;white-space:nowrap;font-weight:500}
 .sg.first{background:var(--accent);color:var(--accent-ink);font-weight:600}
-.sg .q{opacity:.65}
+.sg .q{font-size:11.5px;font-weight:700;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.09)}
+.sg.first .q{background:rgba(0,0,0,.14)}
+.sg.create{padding-right:11px}
 .sg.undo{color:var(--accent);font-weight:700;margin-left:auto}
 .qa-row{display:flex;gap:8px;margin-top:4px}
-.qa-row input{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 14px;font-size:16px;outline:none}
-.qa-row input:focus{border-color:var(--accent)}
+.qa-row input{flex:1;min-width:0;height:48px;border-radius:13px;border:1px solid transparent;background:var(--bg);padding:0 14px 0 36px;font-size:16px;outline:none;transition:border-color 120ms}
+.qa-row input:focus{border-color:rgba(245,181,68,.5)}
 .qa-row input::placeholder{color:var(--dim2)}
 .qa-row button{width:68px;height:48px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:15px}
 .qa-row button:active{filter:brightness(1.1)}
 
 /* tabs */
 .tabs{flex:none;display:flex;height:calc(var(--tabs-h) + var(--sab));padding-bottom:var(--sab);background:var(--surface);border-top:1px solid var(--line)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--dim);font-size:11px;font-weight:600}
-.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--dim2);font-size:10.5px;font-weight:600;letter-spacing:.02em}
+.tab svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tab.active{color:var(--accent)}
+.tab.active svg{stroke-width:2.1}
 
 /* toast */
 .toast{position:absolute;left:12px;right:12px;bottom:calc(var(--tabs-h) + var(--sab) + 10px);z-index:50;background:var(--surface3);
@@ -149,13 +162,15 @@ body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 10px)}
 .mlist{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;position:relative;-webkit-overflow-scrolling:touch}
 .ptr{height:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;color:var(--dim);font-size:12px;padding-bottom:8px;will-change:height}
 .ptr.spin{transition:height 180ms ease}
-.mrow{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);gap:12px;min-height:56px}
+.mrow{position:relative;display:flex;align-items:center;padding:12px 16px;gap:12px;min-height:60px}
+.mrow::after{content:"";position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line)}
 .mrow .body{flex:1;min-width:0}
-.mrow .name{font-weight:500}
-.mrow .item{font-size:11.5px;color:var(--dim2);letter-spacing:.03em;margin-top:2px}
-.mrow .by{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.4}
-.mrow .by b{color:var(--dim);font-weight:600}
-.mrow .tot{font-size:24px;font-weight:700;color:var(--accent);min-width:48px;text-align:right}
+.mrow .name{font-weight:600;font-size:15.5px;letter-spacing:-.005em}
+.mrow .item{font-size:11.5px;color:var(--dim2);letter-spacing:.05em;margin-top:2px}
+.mrow .by{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.mrow .by span{font-size:11.5px;color:var(--dim);background:var(--surface2);border-radius:6px;padding:2px 7px;font-weight:500}
+.mrow .by span b{color:var(--text);font-weight:700;margin-left:3px}
+.mrow .tot{font-size:26px;font-weight:700;color:var(--accent);min-width:52px;text-align:right;letter-spacing:-.02em}
 .actions{flex:none;display:flex;gap:8px;padding:8px 12px;background:var(--surface);border-top:1px solid var(--line)}
 .actions .btn{flex:1}
 
@@ -179,9 +194,11 @@ body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 10px)}
 
 /* cutoffs */
 .scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:24px}
-.card{background:var(--surface);border-radius:14px;padding:14px 16px;margin:0 16px 12px}
-.card .k{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-.card .big2{font-size:30px;font-weight:700;margin:4px 0 2px;letter-spacing:-.01em}
+.card{background:var(--surface);border-radius:16px;padding:16px;margin:0 16px 12px}
+.card .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-weight:700;display:flex;align-items:center;gap:8px}
+.card .k .tag{background:var(--accent);color:var(--accent-ink);border-radius:5px;padding:2px 6px;font-size:10px}
+.card .big2{font-size:34px;font-weight:700;margin:6px 0 2px;letter-spacing:-.02em}
+.card.next{box-shadow:inset 0 0 0 1px rgba(245,181,68,.3)}
 .card.next .big2{color:var(--accent)}
 .card .when{color:var(--dim);font-size:14px}
 .card .when b{color:var(--text);font-weight:600}
@@ -196,7 +213,9 @@ body.has-qa .toast{bottom:calc(var(--tabs-h) + var(--sab) + var(--qa-h) + 10px)}
 /* setup */
 .sec{padding:16px 16px 6px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600;display:flex;justify-content:space-between;align-items:center}
 .sec .btn{height:32px;padding:0 12px;font-size:12px;text-transform:none;letter-spacing:0}
-.li{display:flex;align-items:center;min-height:56px;padding:6px 16px;border-bottom:1px solid var(--line);gap:10px;width:100%;text-align:left}
+.li{position:relative;display:flex;align-items:center;min-height:56px;padding:6px 16px;gap:10px;width:100%;text-align:left}
+.li::after{content:"";position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line)}
+button.li:active{background:var(--surface)}
 .li .body{flex:1;min-width:0}
 .li .name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .li .meta{font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -250,7 +269,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').ca
 
   <form class="qa" id="qa" autocomplete="off">
     <div class="sugg" id="sugg"></div>
-    <div class="qa-row">
+    <div class="qa-row"><span class="plus">+</span>
       <input id="qa-in" type="text" inputmode="text" enterkeyhint="go" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="Add to store…">
       <button type="submit" id="qa-go">Add</button>
     </div>
@@ -466,7 +485,7 @@ let idx = 0;
 const HINT = '<span class="hint"><kbd>ccc 4</kbd> = 4 cases · a bare name = 1 case · item # works too</span>';
 
 function buildTrack() {
-  track.innerHTML = S.stores.map(s => `<div class="pane" data-sid="${s.id}"><div class="colhead"><div class="c-last">Last</div><div class="c-prod"><button type="button" class="mode"></button></div><div class="c-now">This order</div></div><div class="list"></div></div>`).join('');
+  track.innerHTML = S.stores.map(s => `<div class="pane" data-sid="${s.id}"><div class="stitle"><div style="min-width:0"><h2>${esc(s.name)}</h2><div class="sum"></div></div><button type="button" class="mode"></button></div><div class="colhead"><div class="c-last">Last</div><div class="c-prod">Product</div><div class="c-now">This order</div></div><div class="list"></div></div>`).join('');
   S.stores.forEach(s => dirty.add(s.id));
   idx = Math.max(0, S.stores.findIndex(s => s.id === S.ui.store));
   updateModeButtons();
@@ -474,8 +493,15 @@ function buildTrack() {
 }
 const paneEl = sid => track.querySelector(`.pane[data-sid="${sid}"]`);
 function updateModeButtons() {
-  const label = S.ui.showAll ? 'Whole catalog' : 'On order';
-  $$('.mode', track).forEach(b => b.innerHTML = `${label} <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`);
+  const label = S.ui.showAll ? 'Catalog' : 'On order';
+  $$('.stitle .mode', track).forEach(b => b.innerHTML = `${label} <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`);
+}
+function updateSummary(sid) {
+  const pane = paneEl(sid); if (!pane) return;
+  const cur = S.orders.current[sid] || {}, prev = S.orders.previous[sid] || {};
+  const c = Object.values(cur).reduce((a, b) => a + b, 0), n = Object.keys(cur).length;
+  const pc = Object.values(prev).reduce((a, b) => a + b, 0);
+  pane.querySelector('.stitle .sum').textContent = (n ? `${c} case${c === 1 ? '' : 's'} · ${n} line${n === 1 ? '' : 's'} this order` : 'Nothing on this order yet') + (pc ? ` · ${pc} last` : '');
 }
 function renderChips() {
   chips.innerHTML = S.stores.map((s, i) => { const n = lineCount(s.id); return `<button type="button" class="chip${i === idx ? ' active' : ''}" data-i="${i}">${esc(s.short)}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
@@ -486,7 +512,7 @@ chips.addEventListener('click', e => { const c = e.target.closest('.chip'); if (
 
 function rowHTML(p, prev, cur) {
   return `<div class="rw" data-pid="${p.id}"><div class="under">Clear</div><div class="row${cur > 0 ? ' on' : ''}">
-<div class="prev">${prev > 0 ? prev : '<span class="z">–</span>'}</div>
+<div class="prev">${prev > 0 ? `<span>${prev}</span>` : ''}</div>
 <div class="body"><div class="name">${esc(p.name)}</div><div class="item">${p.item ? esc(p.item) : '<span class="noitem">no item #</span>'}</div></div>
 <div class="qc"><button type="button" class="st" data-d="-1" aria-label="one less">−</button><div class="cur">${cur}</div><button type="button" class="st" data-d="1" aria-label="one more">+</button></div>
 </div></div>`;
@@ -508,10 +534,11 @@ function renderPane(sid) {
     for (const pid of ids) { const p = byId.get(pid); if (p) html += rowHTML(p, prev[pid] || 0, cur[pid] || 0); }
     if (!html) {
       const st = storeById(sid);
-      html = `<div class="empty">Nothing on the order for <b>${esc(st ? st.name : '')}</b> yet.<br><br>Type a product in the box below. <kbd>ccc 4</kbd> adds 4 cases of Lance Ccc; a bare name like <kbd>nekot</kbd> adds 1 case.<br><button type="button" class="link mode">Browse the whole catalog instead</button></div>`;
+      html = `<div class="empty"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/><path d="M17 15v6M14 18h6"/></svg><br>Nothing on the order for <b>${esc(st ? st.name : '')}</b> yet.<br><br>Type a product in the box below. <kbd>ccc 4</kbd> adds 4 cases of Lance Ccc; a bare name like <kbd>nekot</kbd> adds 1 case.<br><button type="button" class="link mode">Browse the whole catalog instead</button></div>`;
     }
   }
   list.innerHTML = html;
+  updateSummary(sid);
   dirty.delete(sid);
 }
 function renderPaneIfDirty(sid) { if (dirty.has(sid)) renderPane(sid); }
@@ -528,6 +555,7 @@ function patchRow(sid, pid, reveal) {
     return;
   }
   rw.querySelector('.row').classList.toggle('on', cur > 0);
+  updateSummary(sid);
   const c = rw.querySelector('.cur'); c.textContent = cur;
   if (!RM) { c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); }
   if (reveal) rw.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' });
@@ -692,8 +720,8 @@ function renderMaster() {
   const rows = masterRows();
   const cases = rows.reduce((a, r) => a + r.total, 0);
   $('#master-sub').textContent = rows.length ? `${rows.length} products · ${cases} cases` : 'this order';
-  $('#mrows').innerHTML = rows.length ? rows.map(r => `<div class="mrow"><div class="body"><div class="name">${esc(r.product.name)}</div><div class="item">${r.product.item ? esc(r.product.item) : '<i>no item #</i>'}</div><div class="by">${r.by.map(([sid, q]) => { const s = storeById(sid); return `<b>${esc(s ? s.short : sid)}</b> ${q}`; }).join(' · ')}</div></div><div class="tot">${r.total}</div></div>`).join('')
-    : `<div class="empty">Nothing on this order yet.<br>Add items on the <b>Stores</b> tab and the totals across all ${S.stores.length} stores show up here.<br><span style="color:var(--dim2);font-size:12.5px">Last order's numbers are never counted here.</span></div>`;
+  $('#mrows').innerHTML = rows.length ? rows.map(r => `<div class="mrow"><div class="body"><div class="name">${esc(r.product.name)}</div><div class="item">${r.product.item ? esc(r.product.item) : '<i>no item #</i>'}</div><div class="by">${r.by.map(([sid, q]) => { const s = storeById(sid); return `<span>${esc(s ? s.short : sid)}<b>${q}</b></span>`; }).join('')}</div></div><div class="tot">${r.total}</div></div>`).join('')
+    : `<div class="empty"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><br>Nothing on this order yet.<br>Add items on the <b>Stores</b> tab and the totals across all ${S.stores.length} stores show up here.<br><span style="color:var(--dim2);font-size:12.5px">Last order's numbers are never counted here.</span></div>`;
   $('#btn-step').disabled = !rows.length; $('#btn-copyall').disabled = !rows.length;
 }
 function masterText() {
@@ -870,7 +898,7 @@ function renderCutoffs() {
   let html = cs.map((c, i) => {
     const iso = c.at.toISOString(); const sub = !!S.submitted[iso];
     const pickup = new Date(c.at.getTime() + c.pickupDays * 86400000);
-    return `<div class="card${i === 0 ? ' next' : ''}"><div class="k">${i === 0 ? 'Next cutoff' : 'Then'} · ${c.label} ET</div><div class="big2" data-cd="${c.at.getTime()}">${countdown(c.at - now)}</div><div class="when">${fmtLong.format(c.at)} → pickup <b>${fmtDay.format(pickup)}</b></div><div class="row2"><span style="color:var(--dim);font-size:13px">${sub ? 'Order submitted in OTS' : 'Not submitted yet'}</span><button type="button" class="check${sub ? ' on' : ''}" data-sub="${iso}"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>${sub ? 'Submitted' : 'Mark submitted'}</button></div></div>`;
+    return `<div class="card${i === 0 ? ' next' : ''}"><div class="k">${i === 0 ? '<span class="tag">Next</span>' : 'Then'} ${c.label} ET</div><div class="big2" data-cd="${c.at.getTime()}">${countdown(c.at - now)}</div><div class="when">${fmtLong.format(c.at)} → pickup <b>${fmtDay.format(pickup)}</b></div><div class="row2"><span style="color:var(--dim);font-size:13px">${sub ? 'Order submitted in OTS' : 'Not submitted yet'}</span><button type="button" class="check${sub ? ' on' : ''}" data-sub="${iso}"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>${sub ? 'Submitted' : 'Mark submitted'}</button></div></div>`;
   }).join('');
   html += `<div class="note">This app can't wake your phone before a cutoff — there's no server behind it. Set a phone alarm for Monday and Friday evening.</div>`;
   html += `<div class="card"><div class="k">Rollover</div><p>After you've keyed the order into OTS, roll it over: <b>this order</b> (${lines} products, ${cases} cases) becomes <b>last order</b> on every store sheet, and this order starts empty.</p><p>Only happens when you tap and confirm — never automatically.</p><div class="row2"><span style="color:var(--dim2);font-size:12.5px">${S.lastRollover ? 'Last rollover ' + fmtStamp.format(new Date(S.lastRollover)) : 'No rollover yet'}</span><button type="button" class="btn primary" id="btn-rollover"${lines ? '' : ' disabled'}>Roll over…</button></div>${S.rolloverBackup ? `<div class="btnrow"><button type="button" class="btn" id="btn-unroll">Undo last rollover</button></div>` : ''}</div>`;
