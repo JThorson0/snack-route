@@ -388,35 +388,184 @@ const SEED_STORES = [
   ['Publix 27 (Minneola)', 'P27'], ['Publix 1158', 'P1158'], ['Publix 1751', 'P1751'], ['Publix 1759', 'P1759'],
   ['Publix 881', 'P881'], ['Target Winter Garden', 'T·WG'], ['Target Clermont', 'T·CL']
 ];
-// name, item number (string, leading zeros kept), aliases, category
+// name, item number (string, leading zeros kept), aliases, category, pick-sheet description
+// Source: "Order Pick Sheets (Updated 1/1/25)" — Snyders-Lance pick sheet, Orlando FL.
+const CATALOG_VERSION = 2;
 const SEED_PRODUCTS = [
-  ['Lance Ccc', '115344', 'ccc, lance ccc', 'Lance'],
-  ['VP', '107866', 'vp, variety pack', 'Lance'],
-  ['Nekot', '115345', 'nekot', 'Lance'],
-  ['Tc Cheddar', '115353', 'tc cheddar, tcc', 'Lance'],
-  ['Pbh', '', 'pbh', 'Lance'],
-  ['WG pb', '115356', 'wg pb', 'Lance'],
-  ['Gf original', '114597', 'gf original, gf orig', 'Gf'],
-  ['Gf mini', '089370', 'gf mini', 'Gf'],
-  ['Gf rods', '', 'gf rods', 'Gf'],
-  ['Stella Marg combo', '497500', 'stella, marg combo', 'Stella'],
-  ['Soh Honey braided', '010160', 'soh honey, braided', 'Snyder\'s'],
-  ['SD hard', '080030', 'sd hard, soh sd hard', 'Snyder\'s'],
-  ['Butter rounds', '113282', 'butter rounds', 'Snyder\'s'],
-  ['Butter snaps', '103405', 'butter snaps', 'Snyder\'s'],
-  ['Itty bitty', '108481', 'itty bitty, itty', 'Snyder\'s'],
-  ['Hard box 1/2', '22752', 'hard box', 'Snyder\'s'],
-  ['100\'a mini', '115007', '100a mini, 100 mini', 'Snyder\'s'],
-  ['Sticks', '080090', 'sticks', 'Snyder\'s'],
-  ['Mini', '080060', 'mini', 'Snyder\'s'],
-  ['Nibblers', '080040', 'nibblers, nibs', 'Snyder\'s'],
-  ['Rods', '', 'rods', 'Snyder\'s'],
-  ['Dip stick', '', 'dip stick', 'Snyder\'s'],
-  ['100 camp 20', '', '100 camp, camp 20', 'Snyder\'s'],
-  ['HMO PCs', '', 'hmo pcs, hmo', 'Pretzel Crisps'],
-  ['PB PCs', '', 'pb pcs', 'Pretzel Crisps'],
-  ['HBW', '', 'hbw', 'Pretzel Crisps'],
-  ['Cape Cod Original 8.5 oz', '107361', 'cc original, cape cod original', 'Cape Cod'],
+  ["Toastchee Family Size", "104198", "toastchee fs, tc fs, family toastchee", "Family Size Crackers", "30.3Z LN TOASTCHEE FS;6C x20;NP"],
+  ["Toasty Family Size", "104199", "toasty fs, family toasty", "Family Size Crackers", "25.7Z LN TOASTY FS;6C x20;NP"],
+  ["Nekot Family Size", "107487", "nekot fs, family nekot", "Family Size Crackers", "35Z LN NEKOT FS 6C x20 NP"],
+  ["VP", "107866", "vp, variety pack, var pack", "Family Size Crackers", "27.9Z LN VAR PACK 6C x20 NP"],
+  ["Cream Cheese 20ct", "112530", "cream cheese 20, ccc 20, cc 20ct", "Family Size Crackers", "27z LN CREAM CHEESE 20CT"],
+  ["Toastchee Cheddar 20ct", "112531", "tcc 20, toastchee ched 20", "Family Size Crackers", "28Z LN TOASTCHEE CHED 20CT"],
+  ["WG pb", "115356", "wg pb, whole grain pb, wg pb wht", "Lance HomePacks", "9.075Z LN WG PB WHT HP;14C;NP"],
+  ["WG Cow", "115352", "wg cow, whole grain cow", "Lance HomePacks", "9Z LN WG COW HP;14C;NP"],
+  ["Toastchee HP", "115335", "toastchee, tc, toast chee", "Lance HomePacks", "12.1Z LN TOASTCHEE HP;14C;NP"],
+  ["Malt HP", "115338", "malt, malt hp", "Lance HomePacks", "10.3Z LN MALT HP;14C;NP"],
+  ["Nekot Fudge", "115365", "nekot fudge, fudge", "Lance HomePacks", "LN NEKOT FUDGE 14C"],
+  ["Vanilla Nekot HP", "115355", "vanilla nekot, van nekot, vanolnch", "Lance HomePacks", "13.2Z LAN VANOLNCH NKT-HP;14C"],
+  ["Lemon Nekot", "115340", "lemon nekot, lemon", "Lance HomePacks", "13z LEMON NEKOT 14C"],
+  ["Nekot", "115345", "nekot, nekot hp", "Lance HomePacks", "14Z LN NEKOT HP;14C;NP"],
+  ["Lance Ccc", "115344", "ccc, lance ccc, cream cheese hp, crm chs", "Lance HomePacks", "11Z LANCE CRM CHS(HP);14C"],
+  ["VP Blue HP", "115361", "vp blue, blue vp, blue", "Lance HomePacks", "11.4Z LN VP BLUE HP;14C"],
+  ["Pbh", "115346", "pbh, honey pb, hny pb, pb honey", "Lance HomePacks", "10.5Z LANCE HNY PB-HP;14C"],
+  ["Toasty Cheddar", "115354", "toasty cheddar, toasty ched", "Lance HomePacks", "LN TOASTY CHEDDAR(NEW)"],
+  ["Toasty HP", "115342", "toasty, toasty hp", "Lance HomePacks", "10.3Z LN TOASTY HP;14C"],
+  ["Tc Cheddar", "115353", "tc cheddar, tcc, toastchee cheddar", "Lance HomePacks", "11Z TOASTCHEE CHED 14CT"],
+  ["Captain Wafer VP HP", "115362", "captain wafer, cpt wfr, wafer vp, captains", "Lance HomePacks", "11Z LAN CPT WFR VP HP 14C;NP"],
+  ["Gr Ch Waf HP", "115339", "gr chwaf, gr ch waf, chwaf", "Lance HomePacks", "11Z LANCE GR CHWAF-HP;14C;3.39"],
+  ["White Cheddar HP", "115341", "white cheddar, wht ched, white ched hp", "Lance HomePacks", "11Z LANCE WHITE CHEDDAR 14CT HP"],
+  ["Gf original", "114597", "gf original, gf orig, gluten free crackers", "Gluten Free Crackers", "5Z LN GF ORIGINAL CRCKRS 3.99"],
+  ["SD Almond Toast", "497120", "almond toast, almond", "Stella D'oro", "6.6Z SD ALMOND TST;12C;3.29"],
+  ["SD Original Breakfast", "497080", "breakfast treats, orig breakfast, breakfast", "Stella D'oro", "9Z SD ORIG BREAKFAST;12C;3.29"],
+  ["SD Anisette Toast", "497140", "anisette toast", "Stella D'oro", "5.7Z SD ANISTE TOAST;12C;3.29"],
+  ["SD Vanilla Margherite", "497510", "vanilla marg, vanla marg, vanilla margherite", "Stella D'oro", "12Z SD VANLA MRGHITE;12C;3.69"],
+  ["Stella Marg combo", "497500", "stella, marg combo, margherite combo", "Stella D'oro", "12Z SD MRGHRT COMBO;12C;3.69"],
+  ["SD Anisette Sponge", "497130", "anisette sponge, sponge", "Stella D'oro", "6.1Z SD ANISETTE SPNG;12C;3.29"],
+  ["Stella Roman Egg", "497210", "roman egg, roman", "Stella D'oro", "12Z STELLA ROMAN EGG 12CT"],
+  ["SD Lady Stella", "105405", "lady stella, lady", "Stella D'oro", "10Z SD LADY STELLA 12CT 3.69"],
+  ["SD Swiss Fudge", "802592", "swiss fudge, swiss", "Stella D'oro", "8Z SD SWISS FUDGE 16CT"],
+  ["Archway Iced Molasses", "103526", "iced molasses, molasses", "Archway", "12Z AR ICED MOLASSES BAG ;6C;NP"],
+  ["Archway Oatmeal", "103532", "archway oatmeal, oatmeal", "Archway", "9.5Z AR OATMEAL;9C;NP"],
+  ["Archway Frosty Lemon", "103534", "frosty lemon, frosty", "Archway", "9.25Z AR FROSTY LEMON;9C;NP"],
+  ["Archway Windmill", "103539", "windmill", "Archway", "9Z AR OF WINDMILL;9C;NP"],
+  ["Archway Oatmeal Raisin", "103533", "oatmeal raisin, raisin", "Archway", "9.25Z AR OATMEAL RAISIN;9C;NP"],
+  ["GF HMO Sticks", "111670", "gf hmo sticks, gf hmo", "SOH Gluten Free", "8Z GLUTEN FREE HMO STICKS (12CT"],
+  ["Gf mini", "089370", "gf mini", "SOH Gluten Free", "8Z GLUTEN FR MINI PRET (12 CT)"],
+  ["GF Pretzel Sticks", "087310", "gf sticks, gf pret stk, gf pretzel sticks", "SOH Gluten Free", "8Z GLUTEN FREE PRET STK(12CT)"],
+  ["Gf rods", "112021", "gf rods", "SOH Gluten Free", "8Z GLUTEN FREE RODS (12CT)"],
+  ["GF Sticks 14z", "105828", "gf stick 14, gf 14z, gf sticks 14", "SOH Gluten Free", "14Z GLUTEN FREE STICK 12CT; NP"],
+  ["ES Veggie Sticks", "86940", "veggie sticks, eat smart sticks, es sticks", "Eat Smart", "7Z ES NAT VEGGIE STICKS (12CT)"],
+  ["ES Veggie Crisps", "86990", "veggie crisps, eat smart crisps, es crisps", "Eat Smart", "6Z ES NAT VEGGIE CRISPS(12CT)"],
+  ["HMO PCs", "114657", "hmo pcs, hmo", "SOH Flavor Pieces", "12Z HMO PCS(12CT)"],
+  ["HBW PCs", "114658", "hbw, hbw pcs", "SOH Flavor Pieces", "12Z HBW PCS(12CT)"],
+  ["Ched PCs", "114659", "ched pcs, cheddar pcs, ched", "SOH Flavor Pieces", "12Z CHED PCS(12CT)"],
+  ["Jal PCs", "114660", "jal pcs, jalapeno pcs, jal", "SOH Flavor Pieces", "12Z JAL PCS(12CT)"],
+  ["PB PCs", "107178", "pb pcs, pb filled, pb", "SOH Flavor Pieces", "10Z PB FILLED PCS 12CT"],
+  ["Nashville Hot PCs", "115154", "nashville, nashville hot, nash", "SOH Flavor Pieces", "12Z Nashville Hot PCS"],
+  ["Chdr Sand 8z", "29680", "chdr sand, cheddar sandwich, chdr sand 8z", "SOH Flavor Pieces", "8Z CHDR SAND"],
+  ["HMO PCs Party", "113781", "hmo party, hmo pcs party", "SOH Flavor Pieces", "18Z HMO PCS PARTY"],
+  ["HBW PCs Party", "113782", "hbw party, hbw pcs party", "SOH Flavor Pieces", "18Z HBW PCS PARTY"],
+  ["Ched PCs Party", "113783", "ched party, ch pcs party", "SOH Flavor Pieces", "18Z CH PCS PARTY"],
+  ["Butter snaps", "103405", "butter snaps", "SOH Specialty", "12Z BUTTER SNAPS (12CT)"],
+  ["No Salt Mini", "103404", "no salt mini, ns mini", "SOH Specialty", "12Z NO SALT MINI (12CT)"],
+  ["Dip stick", "103403", "dip stick, dipping stick, dip", "SOH Specialty", "12Z DIPPING STICK (12CT)"],
+  ["Rod Canisters", "87550", "rod canisters, canisters, rod can", "SOH Specialty", "SOH ROD CANISTERS"],
+  ["Rods", "103406", "rods", "SOH Specialty", "12Z RODS (12CT)"],
+  ["SOH Chdr Sandw", "29680", "soh chdr sandw, soh cheddar sandwich", "SOH Specialty", "SOH CHDR SANDW"],
+  ["Soh Honey braided", "010160", "soh honey, braided, hw braid, honey wheat braid", "SOH Specialty", "12Z HW BRAID TW (12CT)"],
+  ["Twisted Pretzel Stick", "114221", "twisted stick, twisted pretzel, twisted", "SOH Specialty", "12Z TWISTED PRETZEL STICK 12CT"],
+  ["SCO Twisted Pretzel", "113944", "sco twisted, sour cream twisted", "SOH Specialty", "12Z SCO TWISTED PRETZEL 12 CT"],
+  ["Jal Ranch Twisted Pretzel", "113921", "jal ranch twisted, jal ranch", "SOH Specialty", "12Z JAL RANCH TWISTED PRETZEL 12 CT"],
+  ["Nacho Twisted Pretzel", "114416", "nacho twisted, nacho", "SOH Specialty", "12Z NACHO TWISTED PRETZEL 12 CT"],
+  ["Homestyle Rings", "111005", "homestyle rings, rings", "SOH Specialty", "SOH HOMESTYLE RINGS"],
+  ["Sticks", "080090", "sticks", "SOH Pounders & Rounds", "16Z STICKS (12CT)"],
+  ["Snaps", "080070", "snaps", "SOH Pounders & Rounds", "16Z SNAPS(12CT)"],
+  ["Nibblers", "080040", "nibblers, nibs", "SOH Pounders & Rounds", "16Z NIBBLER (12CT)"],
+  ["Mini", "080060", "mini", "SOH Pounders & Rounds", "16Z MINI (12CT)"],
+  ["Olde Tyme", "080050", "olde tyme, old time, olde", "SOH Pounders & Rounds", "16Z OLDE TYME(12CT)"],
+  ["SD hard", "080030", "sd hard, soh sd hard, hard", "SOH Pounders & Rounds", "16Z HARD (12CT)"],
+  ["Itty bitty", "108481", "itty bitty, itty", "SOH Pounders & Rounds", "12Z ITTY BITTY (12CT)"],
+  ["Rounds Sea Salt", "113281", "sea salt rounds, rounds ss, rounds sea salt", "SOH Pounders & Rounds", "12Z ROUNDS SEA SALT 12CT"],
+  ["Butter rounds", "113282", "butter rounds", "SOH Pounders & Rounds", "12Z ROUNDS BUTTER 12CT"],
+  ["Hard box 1/2", "22752", "hard box", "Multipack Boxes", "13.5Z SOH HARD BOX"],
+  ["Snaps 100 Cal", "115008", "snaps 100, 100 snaps, snaps 100cal", "Multipack Boxes", "SNAPS CT 100CAL"],
+  ["100'a mini", "115007", "100a mini, 100 mini, mini 100cal", "Multipack Boxes", "MINI 10 CT 100CAL"],
+  ["100 camp 20", "115009", "100 camp, camp 20, 100cal 20ct, 100 cal 20", "Multipack Boxes", "SOH 20 CT 100CAL Mini/Sticks"],
+  ["Kettle VP 20ct", "115018", "kettle vp 20, kettle 20, kf vp 20", "Multipack Boxes", "Kettle VP 20 CT"],
+  ["Kettle VP 10ct", "115016", "kettle vp 10, kettle 10, kf vp 10", "Multipack Boxes", "Kettle VP 10 CT"],
+  ["SOH & CC 20ct", "115375", "soh cc 20, soh and cc, 20ct box", "Multipack Boxes", "SOH & CC 20CT"],
+  ["SOH CC LJ 30ct", "115407", "30ct, soh cc lj, 30 count", "Multipack Boxes", "SOH, CC, & LJ 30CT"],
+  ["Cape Cod Flavor VP 20ct", "115025", "cc flavor vp, cc vp 20, cape cod vp", "Multipack Boxes", "Cape Cod Flavor VP 20 CT"],
+  ["Cape Cod Original 10ct", "115019", "cc original 10, cc 10ct, cape cod 10", "Multipack Boxes", "Cape Cod Original 10 CT"],
+  ["Cape Cod RF 10ct", "115020", "cc rf 10, cape cod rf 10", "Multipack Boxes", "Cape Cod RF 10 CT"],
+  ["CC Reduced Fat XL", "107371", "cc rf xl, rf xl", "Cape Cod XL", "14Z CC RED FAT CHIP;9C;4.99"],
+  ["CC Salted XL", "107370", "cc salted xl, cc xl, cc original xl", "Cape Cod XL", "14Z CC SALTED CHIP9CT $4.99"],
+  ["CC Salt & Vinegar XL", "113850", "cc sv xl, salt vinegar xl", "Cape Cod XL", "14Z CC SALT/VINGR 9CT 4.99"],
+  ["CC Waves Sea Salt XL", "112583", "waves xl, cc waves xl", "Cape Cod XL", "13Z CC WAVES SEA SALT9CT 4.99"],
+  ["CC SCO XL", "113229", "cc sco xl, sour cream onion xl", "Cape Cod XL", "13Z CC SCO;9CT"],
+  ["CC Sweet Mesquite BBQ XL", "113218", "cc bbq xl, mesquite xl", "Cape Cod XL", "13Z CC SWT MESQ BBQ 9CT 4.99"],
+  ["Cape Cod Original 8.5 oz", "107361", "cc original, cape cod original, cc salted, cc", "Cape Cod Large", "8.5Z CC SALTED CHIP(12CT)$3.79"],
+  ["CC 40% RF", "800478", "cc rf, 40 rf, reduced fat, cc reduced fat", "Cape Cod Large", "8Z CC 40% RF CHIP(12C) $3.79"],
+  ["CC Salt & Vinegar", "113848", "cc sv, salt vinegar, cc salt vinegar", "Cape Cod Large", "8Z CC SS & V CHIP(12CT)$3.79"],
+  ["CC Mesquite BBQ", "111662", "cc bbq, mesquite, cc mesquite", "Cape Cod Large", "8Z CC MESQ BBQ CHIP(12CT)$3.79"],
+  ["CC Sea Salt & Cracked Pepper", "113755", "cc ss cp, cracked pepper, cc pepper", "Cape Cod Large", "8Z CC SS & CP(12CT)$3.79"],
+  ["CC RF Sweet Mesquite BBQ", "111661", "cc rf bbq, rf bbq", "Cape Cod Large", "8Z CC RF SW MSQ BBQ;12C;3.79"],
+  ["CC RF Salt & Vinegar", "113851", "cc rf sv, rf sv", "Cape Cod Large", "8Z CC RF SS&VIN;12C;3.79"],
+  ["CC Sweet & Spicy Jalapeno", "113852", "cc jal, sweet spicy jal, cc jalapeno", "Cape Cod Large", "8Z CC SW&SPCY JAL;12C;3.79"],
+  ["CC Sour Cream & Onion", "113228", "cc sco, sour cream onion", "Cape Cod Large", "8Z CC Sour Cream & Onion 12CT $3.79"],
+  ["CC 40% RF White Cheddar SC", "113849", "cc rf wh ch, white cheddar sc, cc white cheddar", "Cape Cod Large", "8Z CC 40% RF WH CH/SC;12C;3.79"],
+  ["CC Dark Russet", "110754", "dark russet, russet", "Cape Cod Large", "CC DARK RUSSET 12CT"],
+  ["CC Waves Honey BBQ", "113230", "waves honey bbq, honey bbq waves", "Cape Cod Large", "CC WAVES HONEY BBQ 12CT"],
+  ["CC Waves Sea Salt", "111550", "waves sea salt, waves, cc waves", "Cape Cod Large", "CC WAVES SEA SALT 12CT"],
+  ["CC Waves Reduced Fat SS", "111551", "waves rf, rf waves", "Cape Cod Large", "CC WAVES REDUCED FAT SS 12CT"],
+  ["CC Waves Ched/SC", "111549", "waves ched, cheddar waves", "Cape Cod Large", "CC WAVES CHED/SC 12CT"],
+  ["CC Waves Jal/Ranch", "112358", "waves jal ranch, jal ranch waves", "Cape Cod Large", "CC WAVES JAL/RANCH 12CT"],
+  ["CC Lite Salt", "112357", "cc lite salt, lite salt, lite", "Cape Cod Large", "CC LITE SALT 12CT"],
+  ["Late July Jalapeno & Lime", "115972", "lj jal lime, jalapeno lime, lj jal", "Late July", "7.8z Late July Jalapeno & Lime"],
+  ["Late July Nacho", "115970", "lj nacho, late july nacho", "Late July", "7.8z Late July Nacho"],
+  ["Late July Sweet Potato", "114442", "lj swt pot, sweet potato, lj sweet potato", "Late July", "7.8z Late July Swt Pot"],
+  ["Late July Sublime", "114438", "lj sublime, sublime", "Late July", "7.8z Late July Sublime"],
+  ["Late July Sea Salt", "114436", "lj sea salt, lj ss, late july sea salt", "Late July", "7.8z Late July Sea Salt"],
+  ["LJ Restaurant Style Sea Salt 9ct", "114427", "lj rest style, restaurant style, lj rest", "Late July", "11Z LJREST STYLE SEA SALT 9CT"],
+  ["LJ Chia Quinoa 9ct", "114429", "chia quinoa, lj chia", "Late July", "11Z LJ CHIA QUINOA 9CT"],
+  ["LJ Lime Tortillas 9ct", "114428", "lj lime torts, lime torts, lj lime 9", "Late July", "11Z LJ LIME TORTS 9CT"],
+  ["LJ Lime Party Size", "114450", "lj lime party, lime party", "Late July", "14.75 oz LJ Lime Party Size"],
+  ["LJ SS Party Size", "114449", "lj ss party, sea salt party", "Late July", "14.75 oz LJ SS Party Size"],
+  ["KF Jalapeno", "114400", "kf jal, kettle jalapeno, kf jalapeno", "Kettle Foods", "8.5Z KF JALAPENO;12C;NP"],
+  ["KF Unsalted", "114406", "kf unsalted, kettle unsalted", "Kettle Foods", "8Z KF UNSALTED"],
+  ["KF Backyard BBQ", "114394", "kf bbq, backyard bbq, kettle bbq", "Kettle Foods", "8.5Z KF BACKYARD BBQ;12C;NP"],
+  ["KF Salt & Pepper", "114403", "kf sp, kf s&p, salt pepper, kettle salt pepper", "Kettle Foods", "8.5Z KF S&P CHIP;12C;NP"],
+  ["KF Salt & Vinegar", "114412", "kf sv, kettle sv, kettle salt vinegar", "Kettle Foods", "8.5Z KF SS&VINEGAR;12C;NP"],
+  ["KF Sea Salt", "114411", "kf sea salt, kf ss, kettle sea salt", "Kettle Foods", "8.5Z KF SEA SALT CHIP;12C;NP"],
+  ["KF Dill Pickle", "114401", "dill pickle, kf dill, kettle dill", "Kettle Foods", "8.5Z KF DILL PICKLE"],
+  ["KF Pepperoncini", "114409", "pepperoncini, kf pepperoncini", "Kettle Foods", "8.5z KF PEPPERONCINI 12CT"],
+  ["KF Honey Dijon", "114397", "honey dijon, kf dijon", "Kettle Foods", "8.5z KF HNY DIJON 12CT"],
+  ["KF Farmstand Ranch", "114396", "farmstand ranch, kf ranch, kettle ranch", "Kettle Foods", "KF FARMSTAND RANCH"],
+  ["KF Habanero Lime", "114402", "habanero lime, kf habanero", "Kettle Foods", "KF HABANERO LIME"],
+  ["KF Parm Garlic", "114408", "parm garlic, kf parm", "Kettle Foods", "KF PARM GARLIC"],
+  ["KF Truffle & Sea Salt", "114404", "truffle, kf truffle", "Kettle Foods", "KF TRUFFLE & SS"],
+  ["KF Air Fried Jalapeno", "114300", "air fried jal, air fried jalapeno", "Kettle Foods", "KF Air Fried Jalapeno"],
+  ["KF Air Fried SSV", "114301", "air fried ssv, air fried salt vinegar", "Kettle Foods", "KF Air Fried SSV"],
+  ["KF Air Fried Himalayan SS", "114302", "air fried him, air fried sea salt, air fried himalayan", "Kettle Foods", "KF Air Fried Him SS"],
+  ["Wise Super Pack 24ct", "114809", "wise super pack, super pack, wise 24", "Wise", "18Z WS 24C SUPER PACK;6C"],
+  ["Wise White Cheddar Doodles", "475600", "wh ch doodles, white cheddar doodles, wise white cheddar", "Wise", "8Z WISE WH CH DOODLES; 12C"],
+  ["Wise Puff Doodles", "475290", "puff doodles, puffs, wise puffs", "Wise", "8.5Z WISE PUFF DDL;12C;3.49"],
+  ["Wise Crunchy Doodles 8.5z", "475280", "crunchy doodles, wise crunchy", "Wise", "8.5Z WISE CRUNCHY DOODLES"],
+  ["Wise White Cheddar Popcorn", "112097", "wh ched popcorn, white cheddar popcorn", "Wise", "6.5Z WS WH CHED PPCRN;10C;3.49"],
+  ["Wise Butter Popcorn", "112096", "butter popcorn, wise butter", "Wise", "7Z WS BUTTER POPCORN;10C;3.49"],
+  ["Wise Ched SC Ridges", "115326", "ched sc ridges, cheddar ridges", "Wise", "7.875Z WS CHD SC RIDGE; 12;2.99"],
+  ["Wise Sour Cream Onion Ridges", "115325", "sco ridges, sour cream ridges", "Wise", "7.875Z WS SR CR ON RIDG;12;2.99"],
+  ["Wise Natural Ridges", "115324", "nat ridges, ridges, natural ridges", "Wise", "7.875Z NAT RIDGES CHP; 12; 2.99"],
+  ["Wise Salt & Vinegar", "114739", "wise sv, wise salt vinegar", "Wise", "6.75Z WS SLT&VIN CHP; 12; 2.99"],
+  ["Wise Onion & Garlic", "114738", "onion garlic, wise onion", "Wise", "6.75Z WS ON & GAR CP; 12; 2.99"],
+  ["Wise BBQ", "114736", "wise bbq", "Wise", "6.75Z WS BBQ CHIP; 12; 2.99"],
+  ["Wise Honey BBQ", "114737", "wise honey bbq, honey bbq", "Wise", "7.5Z WS HNY BBQ CHP; 12; 2.99"],
+  ["Wise Light Salt", "114727", "wise light salt, light salt", "Wise", "7Z WS LGHT SALT CHIP; 12; 2.99"],
+  ["Wise Natural", "114726", "wise nat, wise natural, wise plain", "Wise", "7Z WS NAT CHIP; 12; 2.99"],
+  ["Wise No Salt", "114728", "wise ns, wise no salt, no salt", "Wise", "7Z WS NS CHIP 2.99"],
+  ["Wise Crunchy Doodles", "115765", "ws crunchy doodles, crunchy doodles new", "Wise", "WS Crunchy Doodles"],
+  ["Mambi Reg Pork Rinds 2z", "115424", "mambi reg 2z, pork rinds 2z, mambi 2z", "Mambi", "2Z MAM REG PORK RND 15CT 1.19"],
+  ["Mambi Hot N Spicy Rinds 2z", "115425", "mambi hot 2z, hot rinds 2z", "Mambi", "2Z MAM HOT N SPICY PR 15CT 1.19"],
+  ["Mambi Cracklin Strips 9z", "115432", "cracklin strips 9z, mambi strips 9", "Mambi", "9Z MAM CRACKLN STRIP 12CT 4.89"],
+  ["Mambi Reg Pork Cracklin 8.5z", "115428", "cracklin 8.5, mambi cracklin 8.5", "Mambi", "8.5Z MAM REG PRK CRCKLN 12CT 4.89"],
+  ["Mambi Reg Cracklin 5z", "115433", "cracklin 5z, mambi cracklin 5", "Mambi", "5Z MAM REG CRACKLN 15CT 3.29"],
+  ["Mambi Hot N Spicy Cracklin 5z", "115434", "hot cracklin, mambi hot cracklin", "Mambi", "5Z MAM HOT N SPICY CRACKLN"],
+  ["Mambi Cracklin Strips 6z", "115429", "cracklin strips 6z, mambi strips 6", "Mambi", "6Z MAM CRCKLN STRIPS 15CT 3.29"],
+  ["Mambi Pork Rinds 3.5z", "115427", "pork rinds 3.5, mambi 3.5", "Mambi", "3.5z Mambi Pork Rinds 2.19"],
+  ["Mambi Hot & Spicy Pork Rinds 3.5z", "115430", "hot pork rinds, mambi hot 3.5", "Mambi", "3.5z Mambi Hot and Spicy Pork Rinds 2.19"],
+  ["Toastchee Single Serve", "104133", "toastchee ss, tc single, tc ss", "Lance Single Serve", "1.52Z LN TOASTCHEE; 10ct"],
+  ["Toasty Single Serve", "104132", "toasty ss, toasty single", "Lance Single Serve", "1.29Z LN TOASTY; 10ct"],
+  ["Cream Cheese Single Serve", "107000", "cream cheese ss, ccc ss, ccc single", "Lance Single Serve", "1.37Z LN CREAM CHEESE; 10ct"],
+  ["Nekot Single Serve", "106998", "nekot ss, nekot single", "Lance Single Serve", "1.75Z LN NEKOT CD; 10ct"],
+  ["HMO Pieces Tube", "111808", "hmo tube, hmo pieces tube", "SOH Tubes", "3.25Z SOH HMO PIECES 1.49"],
+  ["HBW Pieces Tube", "111809", "hbw tube, hbw pieces tube", "SOH Tubes", "3.25Z SOH HBW PIECES 1.49"],
+  ["Ched Pieces Tube", "111810", "ched tube, ched pieces tube", "SOH Tubes", "3.25Z SOH CHED PIECES 1.49"],
+  ["CC Salted 2.5z", "106686", "cc single, cc salted ss, cc 2.5", "Cape Cod Single Serve", "2.5Z CC SALTED 24CT $1.69"],
+  ["CC Salt & Vinegar 2.5z", "106687", "cc sv ss, cc sv 2.5", "Cape Cod Single Serve", "2.5Z CC SS&VIN 24CT $1.69"],
+  ["CC Sweet & Spicy Jal 2.5z", "106688", "cc jal ss, cc jal 2.5", "Cape Cod Single Serve", "2.5Z CC SW & SP JAL 24CT $1.69"],
+  ["CC Sweet Mesquite BBQ 2.5z", "106691", "cc bbq ss, cc bbq 2.5", "Cape Cod Single Serve", "2.5Z CC SW MSQ BBQ 24CT $1.69"],
+  ["CC RF Original 2.5z", "107628", "cc rf ss, cc rf 2.5", "Cape Cod Single Serve", "2.5Z CC RF ORIG"],
 ];
 const splitAliases = s => Array.isArray(s) ? s.map(norm).filter(Boolean) : String(s || '').split(',').map(norm).filter(Boolean);
 function shortName(name) {
@@ -428,11 +577,12 @@ function seed() {
   return {
     version: 1,
     stores: SEED_STORES.map((s, i) => ({ id: 's' + (i + 1), name: s[0], short: s[1], color: PALETTE[i % PALETTE.length] })),
-    products: SEED_PRODUCTS.map((p, i) => ({ id: 'p' + (i + 1), name: p[0], item: p[1], aliases: splitAliases(p[2]), category: p[3] })),
+    catalogVersion: CATALOG_VERSION,
+    products: SEED_PRODUCTS.map((p, i) => ({ id: 'p' + (i + 1), name: p[0], item: p[1], aliases: splitAliases(p[2]), category: p[3], desc: p[4] || '' })),
     orders: { current: {}, previous: {} },
     submitted: {},
     rolloverBackup: null, lastRollover: null,
-    ui: { store: 's1', showAll: false, tab: 'stores' }
+    ui: { store: 's1', showAll: false, tab: 'stores', collapsed: {} }
   };
 }
 function cleanOrder(x) {
@@ -452,7 +602,7 @@ function migrate(o) {
     ? o.stores.map((s, i) => ({ id: String(s.id || ('s' + (i + 1))), name: String(s.name || ''), short: String(s.short || shortName(s.name || '')), color: /^#[0-9a-f]{6}$/i.test(s.color || '') ? s.color : PALETTE[i % PALETTE.length] }))
     : d.stores;
   o.products = Array.isArray(o.products)
-    ? o.products.map(p => ({ id: String(p.id || uid()), name: String(p.name || ''), item: String(p.item == null ? '' : p.item).trim(), aliases: splitAliases(p.aliases), category: String(p.category || 'Uncategorized') }))
+    ? o.products.map(p => ({ id: String(p.id || uid()), name: String(p.name || ''), item: String(p.item == null ? '' : p.item).trim(), aliases: splitAliases(p.aliases), category: String(p.category || 'Uncategorized'), desc: String(p.desc || '') }))
     : d.products;
   o.orders = o.orders && typeof o.orders === 'object' ? o.orders : {};
   o.orders.current = cleanOrder(o.orders.current);
@@ -460,6 +610,7 @@ function migrate(o) {
   o.submitted = o.submitted && typeof o.submitted === 'object' ? o.submitted : {};
   o.rolloverBackup = o.rolloverBackup || null;
   o.lastRollover = o.lastRollover || null;
+  o.catalogVersion = Number(o.catalogVersion) || 1;
   o.ui = Object.assign({ store: o.stores[0].id, showAll: false, tab: 'stores', collapsed: {} }, o.ui || {});
   if (!o.ui.collapsed || typeof o.ui.collapsed !== 'object') o.ui.collapsed = {};
   if (!o.stores.some(s => s.id === o.ui.store)) o.ui.store = o.stores[0].id;
@@ -467,8 +618,8 @@ function migrate(o) {
 }
 let S;
 function load() {
-  try { const raw = localStorage.getItem(LS_KEY); if (raw) { S = migrate(JSON.parse(raw)); return; } } catch (e) {}
-  S = seed(); save();
+  try { const raw = localStorage.getItem(LS_KEY); if (raw) { S = migrate(JSON.parse(raw)); if (S.catalogVersion === CATALOG_VERSION) return; } } catch (e) {}
+  S = seed(); save();   // fresh (or catalog reset): stores, full catalog, empty orders
 }
 function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { toast('Could not save — is storage full?'); } }
 const productMap = () => new Map(S.products.map(p => [p.id, p]));
@@ -487,7 +638,7 @@ const lineCount = sid => Object.keys(S.orders.current[sid] || {}).length;
 // ===================== quick-add engine =====================
 function scoreProduct(p, q) {
   let best = 0;
-  const keys = [norm(p.name)].concat(p.aliases);
+  const keys = [norm(p.name)].concat(p.aliases, p.desc ? [norm(p.desc)] : []);
   const qw = q.split(' ');
   for (const k of keys) {
     if (!k) continue;
@@ -1130,7 +1281,7 @@ function renderSetup() {
 let setupFilter = '';
 const CHEV = '<span class="chev"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>';
 function plistHTML(shown) {
-  return shown.map(p => `<button type="button" class="li" data-edit="${p.id}"><div class="body"><div class="name">${esc(p.name)}</div><div class="meta">${p.item ? esc(p.item) : '<i>no item #</i>'} · ${esc(p.category || 'Uncategorized')} · ${esc(p.aliases.join(', ') || 'no shorthand')}</div></div>${CHEV}</button>`).join('') || '<div class="empty">No products match.</div>';
+  return shown.map(p => `<button type="button" class="li" data-edit="${p.id}"><div class="body"><div class="name">${esc(p.name)}</div><div class="meta">${p.item ? esc(p.item) : '<i>no item #</i>'} · ${esc(p.category || 'Uncategorized')} · ${esc(p.aliases.join(', ') || 'no shorthand')}${p.desc ? ' · ' + esc(p.desc) : ''}</div></div>${CHEV}</button>`).join('') || '<div class="empty">No products match.</div>';
 }
 const setupEl = $('#setup');
 setupEl.addEventListener('input', e => {
@@ -1180,6 +1331,7 @@ function openProductEditor(pid) {
 <label class="fld"><span>Name</span><input id="pe-name" value="${esc(p ? p.name : '')}" autocapitalize="words"></label>
 <label class="fld"><span>Item number</span><input id="pe-item" inputmode="numeric" value="${esc(p ? p.item : '')}" placeholder="e.g. 080060"><div class="help">Kept exactly as typed — leading zeros stay.</div></label>
 <label class="fld"><span>Shorthand (what quick-add matches, comma separated)</span><input id="pe-alias" value="${esc(p ? p.aliases.join(', ') : '')}" placeholder="e.g. ccc, lance ccc" autocapitalize="none"></label>
+<label class="fld"><span>Pick-sheet description (also searchable)</span><input id="pe-desc" value="${esc(p ? p.desc : '')}" placeholder="e.g. 11Z LANCE CRM CHS(HP);14C" autocapitalize="characters"></label>
 <label class="fld"><span>Category</span><input id="pe-cat" list="pe-cats" value="${esc(p ? p.category : '')}" placeholder="Uncategorized" autocapitalize="words"><datalist id="pe-cats">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist></label>
 <div class="btnrow">${p ? '<button type="button" class="btn danger" id="pe-del">Delete</button>' : ''}<button type="button" class="btn primary" id="pe-save">Save</button></div>` });
   const el = sh.el;
@@ -1189,8 +1341,9 @@ function openProductEditor(pid) {
     const aliases = splitAliases($('#pe-alias', el).value);
     if (!aliases.length) aliases.push(norm(name));
     const category = $('#pe-cat', el).value.trim() || 'Uncategorized';
-    if (p) Object.assign(p, { name, item, aliases, category });
-    else S.products.push({ id: uid(), name, item, aliases, category });
+    const desc = $('#pe-desc', el).value.trim();
+    if (p) Object.assign(p, { name, item, aliases, category, desc });
+    else S.products.push({ id: uid(), name, item, aliases, category, desc });
     save(); vib(); markAllDirty(); sh.close(); renderSetup();
     toast(p ? 'Saved' : `Added “${esc(name)}”`);
   });
@@ -1207,7 +1360,7 @@ function openProductEditor(pid) {
 function openBulk() {
   const sh = openSheet({ title: 'Bulk paste products', html: `
 <label class="fld"><span>One product per line</span><textarea id="bulk-t" placeholder="Lance Ccc | 115344 | ccc, lance ccc | Lance&#10;Mini | 080060 | mini | Snyder's" autocapitalize="none"></textarea>
-<div class="help">Fields separated by <code>|</code> or tabs: <code>Name | item # | shorthand, more shorthand | Category</code>. Only the name is required. A line whose name matches an existing product updates it.</div></label>
+<div class="help">Fields separated by <code>|</code> or tabs: <code>Name | item # | shorthand, more shorthand | Category | pick-sheet description</code>. Only the name is required. A line whose name matches an existing product updates it.</div></label>
 <div class="btnrow"><button type="button" class="btn primary" id="bulk-go">Import</button></div>` });
   $('#bulk-go', sh.el).addEventListener('click', () => {
     const txt = $('#bulk-t', sh.el).value; let added = 0, updated = 0;
@@ -1216,10 +1369,10 @@ function openBulk() {
       if (!line.trim() || line.trim().startsWith('#')) continue;
       const f = line.split(/\t|\|/).map(x => x.trim());
       const name = f[0]; if (!name) continue;
-      const item = f[1] || '', aliases = splitAliases(f[2] || ''), category = f[3] || '';
+      const item = f[1] || '', aliases = splitAliases(f[2] || ''), category = f[3] || '', desc = f[4] || '';
       const ex = byName.get(norm(name));
-      if (ex) { if (item) ex.item = item; if (aliases.length) ex.aliases = [...new Set(ex.aliases.concat(aliases))]; if (category) ex.category = category; updated++; }
-      else { const p = { id: uid(), name, item, aliases: aliases.length ? aliases : [norm(name)], category: category || 'Uncategorized' }; S.products.push(p); byName.set(norm(name), p); added++; }
+      if (ex) { if (item) ex.item = item; if (aliases.length) ex.aliases = [...new Set(ex.aliases.concat(aliases))]; if (category) ex.category = category; if (desc) ex.desc = desc; updated++; }
+      else { const p = { id: uid(), name, item, aliases: aliases.length ? aliases : [norm(name)], category: category || 'Uncategorized', desc }; S.products.push(p); byName.set(norm(name), p); added++; }
     }
     save(); vib(); markAllDirty(); sh.close(); renderSetup();
     toast(`Imported: ${added} added, ${updated} updated`);
@@ -1262,18 +1415,18 @@ load();
 // ?demo — load a realistic "last order was submitted and rolled over" state so the two-column view can be seen.
 // One-shot: the param is removed from the URL. Setup → Reset clears it again.
 if (new URLSearchParams(location.search).has('demo')) {
-  const ids = productMap();
-  const only = o => { const out = {}; for (const sid in o) { out[sid] = {}; for (const pid in o[sid]) if (ids.has(pid)) out[sid][pid] = o[sid][pid]; } return out; };
+  const byItem = new Map(); S.products.forEach(p => { if (p.item && !byItem.has(p.item)) byItem.set(p.item, p.id); });
+  const only = o => { const out = {}; for (const sid in o) { out[sid] = {}; for (const item in o[sid]) { const pid = byItem.get(item); if (pid) out[sid][pid] = o[sid][item]; } } return out; };
   S.orders.previous = only({
-    s1: { p1: 6, p2: 2, p3: 2, p8: 3, p17: 2, p19: 1, p20: 2, p27: 2 },
-    s2: { p1: 4, p2: 1, p7: 2, p14: 1, p19: 2 },
-    s3: { p1: 3, p3: 1, p11: 2, p13: 1, p18: 2 },
-    s4: { p1: 5, p4: 2, p10: 1, p15: 2, p16: 1 },
-    s5: { p1: 2, p2: 2, p12: 1, p19: 1, p27: 3 },
-    s6: { p1: 2, p24: 2, p25: 1, p26: 2 },
-    s7: { p1: 3, p24: 1, p26: 1, p27: 1 }
+    s1: { '115344': 6, '107866': 2, '115345': 2, '089370': 3, '115007': 2, '080060': 1, '080040': 2, '107361': 2 },
+    s2: { '115344': 4, '107866': 1, '114597': 2, '103405': 1, '080060': 2 },
+    s3: { '115344': 3, '115345': 1, '010160': 2, '113282': 1, '080090': 2 },
+    s4: { '115344': 5, '115353': 2, '497500': 1, '108481': 2, '22752': 1 },
+    s5: { '115344': 2, '107866': 2, '080030': 1, '080060': 1, '107361': 3 },
+    s6: { '115344': 2, '114657': 2, '107178': 1, '114658': 2 },
+    s7: { '115344': 3, '114657': 1, '114658': 1, '107361': 1 }
   });
-  S.orders.current = only({ s1: { p1: 2, p20: 1 } });
+  S.orders.current = only({ s1: { '115344': 2, '080040': 1 } });
   S.lastRollover = Date.now() - 2 * 86400000;
   S.rolloverBackup = null;
   S.ui.store = S.stores[0].id; S.ui.tab = 'stores'; S.ui.showAll = false;

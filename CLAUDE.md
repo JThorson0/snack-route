@@ -45,6 +45,16 @@ original "one accent color" line in the spec — the user asked for it.
 - Suggestion strip above the input has a fixed height so the list never shifts.
 - Respect `prefers-reduced-motion`.
 
+## Catalog
+
+Seeded from "Order Pick Sheets (Updated 1/1/25)" (Snyders-Lance, Orlando) — 174
+products, 20 categories, in `SEED_PRODUCTS` as `[name, item, aliases, category,
+desc]`. `CATALOG_VERSION` in index.html: bumping it makes every phone reset to a
+fresh seed on next load (stores, catalog, **both orders** wiped) — only do that
+when the user asks for a full reset. Item `29680` is intentionally on two
+products. User's own shorthand names (Lance Ccc, Pbh, Tc Cheddar, 100 camp 20, …)
+are kept as product names; the pick-sheet text lives in `desc` and is searchable.
+
 ## Cutoffs
 
 Tue 07:30 America/New_York → Thursday pickup. Sat 07:30 → Tuesday pickup.
