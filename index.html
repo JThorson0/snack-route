@@ -30,6 +30,12 @@ kbd{font:inherit;background:var(--surface2);padding:1px 7px;border-radius:6px;co
 b{font-weight:700}
 svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
+/* On a wide screen (desktop), present the phone layout in a phone-sized frame instead of stretching it. */
+@media (min-width:560px){
+  body{background:#050608}
+  #app{left:50%;top:50%;transform:translate(-50%,-50%);width:412px;height:min(100%,900px);border-radius:28px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.6);background:var(--bg)}
+  .sheet,.toast,.backdrop{}
+}
 .view{flex:1;min-height:0;display:flex;flex-direction:column}
 .view[hidden]{display:none}
 

@@ -1,5 +1,5 @@
 // Cache-first service worker. Bump CACHE whenever any shell file changes.
-const CACHE = 'snackroute-v3';
+const CACHE = 'snackroute-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
